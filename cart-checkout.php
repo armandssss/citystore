@@ -61,10 +61,12 @@ foreach ($cartItems as $item) {
     ];
 }
 
+$env = parse_ini_file('.env');
+
 $checkout_session = \Stripe\Checkout\Session::create([
     "mode" => "payment",
-    "success_url" => "https://citystore.kvd.lv/checkout-success.php?status=success",
-    "cancel_url" => "https://citystore.kvd.lv/shopping_cart.php",
+    "success_url" => $env["STRIPE_SUCCESS"],
+    "cancel_url" => $env["STRIPE_CANCEL"],
     "locale" => "auto",
     "line_items" => $lineItems,
 ]);
