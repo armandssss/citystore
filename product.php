@@ -35,7 +35,7 @@ $is_admin = isset($user_id) ? isAdmin($conn, $user_id) : false;
 
 if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
-    $sql = "SELECT * FROM Products WHERE product_id = ?";
+    $sql = "SELECT * FROM products WHERE product_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $product_id);
     $stmt->execute();

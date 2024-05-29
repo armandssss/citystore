@@ -125,7 +125,7 @@ is_loggedin($conn);
                     if ($result->num_rows > 0) {
                         while ($product = $result->fetch_assoc()) {
                             echo "<div class='product-card'>";
-                            echo "<a href='product.php?id=" . $product['product_id'] . "'>";
+                            echo "<a href='/product.php?id=" . $product['product_id'] . "'>";
                             echo "<div class='product-card-top'>";
                             echo "<img class='product-card-img' src='" . $product['image_url'] . "' alt='" . $product['name'] . "'>";
                             echo "</div>";
