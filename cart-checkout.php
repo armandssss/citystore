@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include 'db.php';
 require __DIR__ . "/vendor/autoload.php";
-$uploadsFolder = "C:/xampp/htdocs/seeyah/uploads";
+$uploadsFolder = "/uploads";
 
 $stripe_secret_key = "sk_test_51OP1WTFpFWLlek0v0V40c2j9IxfQIzeBgoEGw8iMLlgEuHz8PEwaYzUSay2lPo1GRULhgmpwQRy8dA5QFJVXSap100KtRGOuH8";
 
@@ -63,8 +63,8 @@ foreach ($cartItems as $item) {
 
 $checkout_session = \Stripe\Checkout\Session::create([
     "mode" => "payment",
-    "success_url" => "/checkout-success.php?status=success",
-    "cancel_url" => "/shopping_cart.php",
+    "success_url" => "https://citystore.kvd.lv/checkout-success.php?status=success",
+    "cancel_url" => "https://citystore.kvd.lv/shopping_cart.php",
     "locale" => "auto",
     "line_items" => $lineItems,
 ]);
