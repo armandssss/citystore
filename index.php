@@ -47,7 +47,7 @@ if ($category_result) {
 if (isset($_GET['search'])) {
     $searchQuery = $_GET['search_query'];
 
-    $sql = "SELECT product_id, name, description, price, image_url, company FROM products WHERE name LIKE ?";
+    $sql = "SELECT product_id, name, description, price, image_url, company FROM Products WHERE name LIKE ?";
     $stmt = $conn->prepare($sql);
     $searchParam = "%" . $searchQuery . "%";
     $stmt->bind_param("s", $searchParam);
@@ -64,7 +64,7 @@ if (isset($_GET['search'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $sql = "SELECT product_id, name, description, price, image_url, company FROM products";
+    $sql = "SELECT product_id, name, description, price, image_url, company FROM Products";
     $result = $conn->query($sql);
 }
 
@@ -101,7 +101,7 @@ is_loggedin($conn);
                 <div class="search-categories">
                     <div class="category-dropdown">
                         <select id="category-dropdown" onchange="window.location.href=this.value">
-                            <option value="https://citystore.kvd.lv/" <?php if (!isset($_GET['category'])) echo 'selected'; ?>>All Products</option>
+                            <option value="/" <?php if (!isset($_GET['category'])) echo 'selected'; ?>>All Products</option>
                             <?php foreach ($categories as $category) : ?>
                                 <option value="?category=<?php echo $category['category_id']; ?>"
                                     <?php if (isset($_GET['category']) && $_GET['category'] == $category['category_id']) echo 'selected'; ?>>
@@ -112,7 +112,7 @@ is_loggedin($conn);
                         <i class="fa-solid fa-caret-down"></i>
                     </div>
                     <div class="search-container">
-                        <form method="GET" action="https://citystore.kvd.lv/" class="search-form">
+                        <form method="GET" action="/" class="search-form">
                             <div class="search-wrapper">
                                 <input name="search_query" placeholder="Search for products..." class="search-input">
                                 <button name="search" class="search-btn"><i class="fas fa-search"></i></button>
