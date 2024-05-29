@@ -12,7 +12,7 @@ $stripe_secret_key = "sk_test_51OP1WTFpFWLlek0v0V40c2j9IxfQIzeBgoEGw8iMLlgEuHz8P
 \Stripe\Stripe::setApiKey($stripe_secret_key);
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: http://localhost/');
+    header('Location: /');
     exit;
 }
 
@@ -63,8 +63,8 @@ foreach ($cartItems as $item) {
 
 $checkout_session = \Stripe\Checkout\Session::create([
     "mode" => "payment",
-    "success_url" => "http://localhost/checkout-success.php?status=success",
-    "cancel_url" => "http://localhost/shopping_cart.php",
+    "success_url" => "/checkout-success.php?status=success",
+    "cancel_url" => "/shopping_cart.php",
     "locale" => "auto",
     "line_items" => $lineItems,
 ]);

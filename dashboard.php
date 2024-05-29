@@ -3,7 +3,7 @@ include 'db.php';
 session_start();
 
 if (!(isset($_SESSION['user_id']) && $_SESSION['user_id'])) {
-    header("Location: http://localhost/citystore/");
+    header("Location: /");
     exit();
 }
 $user_id = $_SESSION['user_id'];
@@ -18,7 +18,7 @@ if ($check_admin_result->num_rows > 0) {
 }
 
 if (!$is_admin) {
-    header("Location: http://localhost/citystore/");
+    header("Location: /");
     exit();
 }
 $cart_count = 0;

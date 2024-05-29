@@ -8,7 +8,7 @@ $stripe_secret_key = "sk_test_51OP1WTFpFWLlek0v0V40c2j9IxfQIzeBgoEGw8iMLlgEuHz8P
 
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header('Location: http://localhost/citystore/');
+    header('Location: /');
     exit;
 }
 
@@ -36,8 +36,8 @@ try {
             "quantity" => 1,
         ]],
         "mode" => "payment",
-        "success_url" => "http://localhost/citystore/checkout-success.php?status=success&id=$product_id&price=$product_price&name=" . urlencode($product_name),
-        "cancel_url" => "http://localhost/citystore/",
+        "success_url" => "/checkout-success.php?status=success&id=$product_id&price=$product_price&name=" . urlencode($product_name),
+        "cancel_url" => "/",
         "locale" => "auto",
     ]);
 
