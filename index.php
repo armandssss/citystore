@@ -47,7 +47,7 @@ if ($category_result) {
 if (isset($_GET['search'])) {
     $searchQuery = $_GET['search_query'];
 
-    $sql = "SELECT product_id, name, description, price, image_url, company FROM Products WHERE name LIKE ?";
+    $sql = "SELECT product_id, name, description, price, image_url, company FROM products WHERE name LIKE ?";
     $stmt = $conn->prepare($sql);
     $searchParam = "%" . $searchQuery . "%";
     $stmt->bind_param("s", $searchParam);
@@ -64,7 +64,7 @@ if (isset($_GET['search'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $sql = "SELECT product_id, name, description, price, image_url, company FROM Products";
+    $sql = "SELECT product_id, name, description, price, image_url, company FROM products";
     $result = $conn->query($sql);
 }
 
