@@ -1,0 +1,13 @@
+{
+    "name": "arman/citystore",
+    "description": "Online store",
+    "type": "project",
+    "require": {
+        "stripe/stripe-php": "^13.8"
+    },
+    "authors": [
+        {
+            "name": "Armands"
+        }
+    ]
+}
