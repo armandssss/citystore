@@ -1,8 +1,10 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "veikals";
+$env = parse_ini_file('.env');
+
+$servername = $env["SERVER"];
+$username = $env["USERNAME"];
+$password = $env["PASSWORD"];
+$dbname = $env["DBNAME"];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

@@ -101,7 +101,7 @@ is_loggedin($conn);
                 <div class="search-categories">
                     <div class="category-dropdown">
                         <select id="category-dropdown" onchange="window.location.href=this.value">
-                            <option value="http://localhost/citystore/" <?php if (!isset($_GET['category'])) echo 'selected'; ?>>All Products</option>
+                            <option value="http://localhost/" <?php if (!isset($_GET['category'])) echo 'selected'; ?>>All Products</option>
                             <?php foreach ($categories as $category) : ?>
                                 <option value="?category=<?php echo $category['category_id']; ?>"
                                     <?php if (isset($_GET['category']) && $_GET['category'] == $category['category_id']) echo 'selected'; ?>>
@@ -112,7 +112,7 @@ is_loggedin($conn);
                         <i class="fa-solid fa-caret-down"></i>
                     </div>
                     <div class="search-container">
-                        <form method="GET" action="http://localhost/citystore/" class="search-form">
+                        <form method="GET" action="http://localhost/" class="search-form">
                             <div class="search-wrapper">
                                 <input name="search_query" placeholder="Search for products..." class="search-input">
                                 <button name="search" class="search-btn"><i class="fas fa-search"></i></button>

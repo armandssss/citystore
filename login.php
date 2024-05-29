@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($role === 'admin') {
                     $output['redirect'] = "dashboard.php";
                 } else {
-                    $output['redirect'] = "http://localhost/citystore/";
+                    $output['redirect'] = "http://localhost/";
                 }
             } else {
                 $output['error'] = "Invalid username/email or password.";

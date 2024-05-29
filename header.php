@@ -54,7 +54,7 @@ $totalCartQuantity = getTotalCartQuantity();
     <div class="header-items">
         <div class="main-nav-items">
             <div class="title">
-                <a href="http://localhost/citystore/">
+                <a href="http://localhost/">
                     <img src="uploads/citystore-logo.png" alt="Logo" class="logo">
                 </a>
                 <a href="javascript:void(0);" class="icon" onclick="myFunction()">
@@ -68,7 +68,7 @@ $totalCartQuantity = getTotalCartQuantity();
                             <a href="dashboard.php" class="btn admin-btn">Admin Panel</a>
                         </div>
                     <?php endif; ?>
-                    <a href="http://localhost/citystore/" class="btn">Home</a>
+                    <a href="http://localhost/" class="btn">Home</a>
                     <a href="about.php" class="btn">About</a>
                     <a href="contacts.php" class="btn">Contacts</a>
                     <a href="shopping_cart.php" class="btn">

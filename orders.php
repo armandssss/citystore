@@ -3,7 +3,7 @@ session_start();
 include "db.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: http://localhost/citystore/");
+    header("Location: http://localhost/");
     exit;
 }
 
