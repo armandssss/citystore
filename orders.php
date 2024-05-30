@@ -108,39 +108,39 @@ function displayProductInfo($conn, $productId, $quantity) {
 <div class="wrapper">
     <?php include 'header.php'; ?>
     <div class="container">
-    <div class="main-page-wrapper">
-        <div class="user-center">
-            <div class="settings-buttons">
-                <a class="settings-btn" href="users_profile.php">Profile</a>
-                <a class="settings-btn active" href="orders.php">Orders</a>
-                <a class="settings-btn" href="settings.php">Settings</a>
-            </div>
-            <div class="user-orders">
-                <h1>My Orders</h1>
-                <?php
-                if (isset($_SESSION['user_id'])) {
-                    $user_id = $_SESSION['user_id'];
-                    $sql = "SELECT DISTINCT order_id FROM orders WHERE user_id = ?";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("i", $user_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
+        <div class="main-page-wrapper">
+            <div class="user-center">
+                <div class="settings-buttons">
+                    <a class="settings-btn" href="users_profile.php">Profile</a>
+                    <a class="settings-btn active" href="orders.php">Orders</a>
+                    <a class="settings-btn" href="settings.php">Settings</a>
+                </div>
+                <div class="user-orders">
+                    <h1>My Orders</h1>
+                    <?php
+                    if (isset($_SESSION['user_id'])) {
+                        $user_id = $_SESSION['user_id'];
+                        $sql = "SELECT DISTINCT order_id FROM orders WHERE user_id = ?";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("i", $user_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            $orderId = $row['order_id'];
-                            displayOrderDetails($conn, $orderId);
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $orderId = $row['order_id'];
+                                displayOrderDetails($conn, $orderId);
+                            }
+                        } else {
+                            echo "<p>You haven't ordered anything yet...</p>";
                         }
                     } else {
-                        echo "You haven't ordered anything yet...";
+                        echo "<p>User not logged in.</p>";
                     }
-                } else {
-                    echo "User not logged in.";
-                }
-                ?>
+                    ?>
+                </div>
             </div>
         </div>
-    </div>
     </div>
     <?php include 'footer.php'; ?>
 </div>
