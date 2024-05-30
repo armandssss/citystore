@@ -53,7 +53,7 @@ function displayOrderDetails($conn, $orderId) {
             displayProductInfo($conn, $productId, $quantity);
         }
         echo "<div class='invoice-box'>";
-        echo "<a href='#' onclick='openInvoiceModal($orderId)' class='logout-btn'>View Invoice</a>";
+        echo "<a href='#' onclick='openInvoiceModal($orderId)' ><i class='fas fa-receipt'></i></a>";
         echo "</div>";
         echo "</div>";
     } else {
