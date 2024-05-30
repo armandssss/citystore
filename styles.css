@@ -1203,7 +1203,6 @@ input:focus {
     padding: 8px 16px;
     width: 100%;
     font-size: 16px;
-    background-color: rgba(255,255,255,0.2);
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
     font-weight: 200;
@@ -1220,7 +1219,6 @@ input:focus {
     padding: 8px 16px;
     width: 100%;
     font-size: 16px;
-    background-color: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #000;
     font-weight: 200;

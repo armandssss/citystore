@@ -79,8 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-<correct_hash_here>" crossorigin="anonymous">
   <title>Admin Dashboard</title>
 </head>
-<style>
-</style>
 <body>
 <div class="wrapper">
 <?php include 'header.php'; ?> 
