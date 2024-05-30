@@ -265,6 +265,7 @@ body {
     flex-direction: row;
     flex-wrap: wrap;
     margin-bottom: 25px;
+    flex: 1 0 100%;
 }
 @media only screen and (max-width:780px){
     .card__body {
@@ -274,7 +275,10 @@ body {
 .card__body .half {
     box-sizing: border-box;
     padding: 0 15px;
-    flex: 1 0 100%;
+}
+
+.half {
+    flex: 1 0 50%;
 }
 
 .featured_text h1 {
