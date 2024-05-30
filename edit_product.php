@@ -107,131 +107,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-<correct_hash_here>" crossorigin="anonymous">
     <title>Edit Product</title>
-    <style>
-        .file-area {
-            width: 100%;
-            position: relative;
-        }
-
-        .file-area input[type=file] {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .file-area .file-dummy {
-            width: 100%;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            text-align: center;
-            transition: background 0.3s ease-in-out;
-            position: relative;
-        }
-
-        .file-area:hover .file-dummy {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .file-area input[type=file]:focus + .file-dummy {
-            outline: 2px solid rgba(255, 255, 255, 0.5);
-            outline: -webkit-focus-ring-color auto 5px;
-        }
-
-        .file-area input[type=file]:valid + .file-dummy {
-            border-color: rgba(0, 255, 0, 0.4);
-            background-color: rgba(0, 255, 0, 0.3);
-        }
-
-        .file-area input[type="file"],
-        .form-controll,
-        .form-controll {
-            background-color: #fff;
-            border-color: #ccc;
-            box-shadow: none;
-            display: block;
-            padding: 8px 16px;
-            width: 100%;
-            font-size: 16px;
-            color: #000;
-            font-weight: 200;
-        }
-
-        .file-area .file-dummy {
-            border-color: #ccc;
-            width: calc(100% - 8px);
-            padding: 30px 0px;
-        }
-
-        h1 {
-            text-align: center;
-            margin: 50px auto;
-            font-weight: 100;
-        }
-
-        label {
-            font-weight: 500;
-            display: block;
-            margin: 4px 0;
-            text-transform: uppercase;
-            font-size: 13px;
-            overflow: hidden;
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            margin-left: 10px;
-        }
-
-        label span {
-            float: right;
-            text-transform: none;
-            font-weight: 200;
-            line-height: 1em;
-            font-style: italic;
-            opacity: 0.8;
-            margin-right: 10px;
-        }
-
-        .form-controll:focus {
-            outline: 2px solid rgba(255, 255, 255, 0.5);
-            outline: -webkit-focus-ring-color auto 5px;
-        }
-
-        .form-group {
-            max-width: 500px;
-            margin: auto;
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .current-image {
-            max-width: 100%;
-            max-height: 200px;
-            margin-bottom: 10px;
-        }
-
-        .file-dummy img {
-            max-width: 100%;
-            max-height: 200px;
-            margin: auto;
-        }
-    </style>
 </head>
 <body>
     <div class="wrapper">
         <header>
             <?php include 'header.php'; ?> 
         </header>
-        <div class="big-container">
+        <div class="container">
             <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
                 <?php
                     if ($updateSuccess) {
@@ -250,12 +132,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="form-group">
                     <label for="price">Product Price:</label>
-                    <input type="text" id="price" name="price" step="0.01" value="<?php echo isset($product['price']) ? $product['price'] : ''; ?>" class="form-controll">
+                    <input type="number" id="price" name="price" step="0.01" value="<?php echo isset($product['price']) ? $product['price'] : ''; ?>" class="form-controll">
                 </div>
                 <div class="form-group file-area">
                     <label for="image_upload">Edit Image:</label>
-                    <div class="file-dummy">
-                    <input type="file" id="image_upload" name="image_upload" class="form-controll">
+                    <div class="file-dummy <?php echo isset($product['image_url']) ? 'success' : ''; ?>">
+                        <input type="file" id="image_upload" name="image_upload" class="form-controll">
                         <div class="success">Great, your file is selected. Proceed.</div>
                         <div class="default">Please select a file</div>
                         <img id="current-image" src="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" alt="Current Image" class="current-image" style="<?php echo isset($product['image_url']) ? '' : 'display:none;'; ?>">
@@ -264,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="form-group file-area">
                     <label for="image_upload_2">Edit Additional Image:</label>
-                    <div class="file-dummy">
+                    <div class="file-dummy <?php echo isset($product['image_url']) ? 'success' : ''; ?>">
                     <input type="file" id="image_upload_2" name="image_upload_2" class="form-controll">
                         <div class="success">Great, your file is selected. Proceed.</div>
                         <div class="default">Please select a file</div>
