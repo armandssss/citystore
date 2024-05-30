@@ -1811,15 +1811,16 @@ input[type="submit"]:focus {
 }
 
 .order-box {
-    background-color: #f9f9f9;
-    border: 1px solid #e0e0e0;
+    background-color: var(--bg-color);
+    border: 1px solid rgba(0, 0, 0, .125);
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
     margin: 20px;
     box-sizing: border-box;
     width: 50%;
+    color: var(--text-color);
 }
 
 @media only screen and (max-width: 990px) {
@@ -1842,7 +1843,7 @@ input[type="submit"]:focus {
 }
 
 .order-box h3 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 10px;
 }
 
@@ -1862,12 +1863,12 @@ input[type="submit"]:focus {
 }
 
 .item-name-price h3 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 5px;
 }
 
 .cart-item-price {
-    color: #777;
+    color: var(--text-color);
     margin-bottom: 5px;
 }
 
