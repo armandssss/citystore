@@ -108,9 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>CityStore - Ļoti ērti lietojams un lietotājam draudzīgs testa interneta veikals</title>
     <meta name="description" content="Testa interneta veikals Citystore – ļoti ērti lietojams un lietotājam draudzīgs interneta veikals.">
     <meta name="keywords" content="CityStore, Citystore, citystore, kvd, lv, iPhone 15 Pro, AirPods Pro, AirPods Max, Apple Watch, MacBook Pro, iPhone SE, iPad Air Pro, Apple Watch SE, AirPods 3, Mac Mini, Apple TV 4K, MacBook Air, Apple">
-    <meta property="og:title" content="CityStore - citystore.kdv.lv">
-    <meta property="og:url" content="https://citystore.kdv.lv/">
-    <meta property="og:image" content="/citystore.png">
+    <meta property="og:title" content="CityStore - citystore.kvd.lv">
+    <meta property="og:url" content="https://citystore.kvd.lv/">
+    <meta property="og:image" content="https://citystore.kvd.lv/citystore.png">
     <meta property="og:description" content="Ļoti ērti lietojams un lietotājam draudzīgs testa interneta veikals.">
 </head>
 <body>
