@@ -134,15 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
                 <div class="products">
-                    <?php
+                <?php
                     if ($result->num_rows > 0) {
                         while ($product = $result->fetch_assoc()) {
                             echo "<div class='product-card'>";
                             if ($is_admin) {
                                 echo "<div class='admin-buttons'>";
-                                echo "<form method='POST' action='' style='display:inline-block;'>";
-                                echo "<input type='hidden' name='delete_product_id' value='" . $product['product_id'] . "'>";
-                                echo "<a type='submit' class='remove-btn'><i class='fas fa-trash-alt'></i></button>";
+                                echo "<form id='delete_form' method='POST' action='' style='display:inline-block;'>";
+                                echo "<input type='hidden' id='delete_product_id' name='delete_product_id' value=''>";
+                                echo "<a href='#' class='remove-btn' onclick='submitForm(" . $product['product_id'] . ")'><i class='fas fa-trash-alt'></i></a>";
                                 echo "</form>";
                                 echo "<a href='/edit_product.php?id=" . $product['product_id'] . "' class='edit-btn'><i class='fas fa-pencil-alt'></i></a>";
                                 echo "</div>";
@@ -176,5 +176,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php include 'footer.php'; ?>
         </footer>
     </div>
+<script>
+    function submitForm(productId) {
+        if(confirm('Are you sure you want to delete this product?')) {
+            document.getElementById('delete_product_id').value = productId;
+            document.getElementById('delete_form').submit();
+        }
+    }
+</script>
 </body>
 </html>
