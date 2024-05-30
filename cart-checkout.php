@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include 'db.php';
 require __DIR__ . "/vendor/autoload.php";
-$uploadsFolder = "uploads";
+$uploadsFolder = "uploads/";
 
 $stripe_secret_key = "sk_test_51OP1WTFpFWLlek0v0V40c2j9IxfQIzeBgoEGw8iMLlgEuHz8PEwaYzUSay2lPo1GRULhgmpwQRy8dA5QFJVXSap100KtRGOuH8";
 
