@@ -56,6 +56,7 @@ foreach ($cartItems as $item) {
             "unit_amount" => $item['price'] * 100,
             "product_data" => [
                 "name" => $item['name'],
+                "images" => [$_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $uploadsFolder . '/' . $item['image_url']],
             ],
         ],
     ];
