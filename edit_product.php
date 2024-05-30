@@ -165,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .file-area .file-dummy {
             border-color: #ccc;
-            width: calc(100% - 18px);
+            width: calc(100% - 8px);
             padding: 30px 0px;
         }
 

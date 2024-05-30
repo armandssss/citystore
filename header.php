@@ -113,7 +113,7 @@ $totalCartQuantity = getTotalCartQuantity();
             </div>
         </div>
     </div>
-<script>
+    <script>
     function openLoginModal() {
         const modal = document.getElementById("loginModal");
         modal.style.display = "block";
