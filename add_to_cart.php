@@ -5,28 +5,58 @@ include 'db.php';
 if (isset($_GET['id'])) {
     $product_id = $_GET['id'];
 
+    // Preventing rapid add-to-cart actions
     if (isset($_SESSION['last_added_time'][$product_id])) {
         if (time() - $_SESSION['last_added_time'][$product_id] < 5) {
             header("Location: product.php?id=" . $product_id . "&error=added_recently");
             exit;
         }
     }
+
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
 
-        $stmt = $conn->prepare("INSERT INTO cart (user_id, product_id) VALUES (?, ?)");
-        $stmt->bind_param("ii", $user_id, $product_id);
+        // Check if the product is already in the user's cart
+        $check_cart_query = "SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?";
+        $check_cart_stmt = $conn->prepare($check_cart_query);
+        $check_cart_stmt->bind_param("ii", $user_id, $product_id);
+        $check_cart_stmt->execute();
+        $result = $check_cart_stmt->get_result();
 
-        if ($stmt->execute()) {
-            $_SESSION['last_added_time'][$product_id] = time();
-            updateCartTotal($user_id);
+        if ($result->num_rows > 0) {
+            // Product is already in the cart, update the quantity
+            $row = $result->fetch_assoc();
+            $new_quantity = $row['quantity'] + 1;
+            $update_cart_query = "UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?";
+            $update_cart_stmt = $conn->prepare($update_cart_query);
+            $update_cart_stmt->bind_param("iii", $new_quantity, $user_id, $product_id);
 
-            header("Location: product.php?id=" . $product_id . "&success=added_to_cart");
-            exit;
+            if ($update_cart_stmt->execute()) {
+                $_SESSION['last_added_time'][$product_id] = time();
+                updateCartTotal($user_id);
+                header("Location: product.php?id=" . $product_id . "&success=added_to_cart");
+                exit;
+            } else {
+                echo "Error updating item quantity in the cart: " . $update_cart_stmt->error;
+            }
+            $update_cart_stmt->close();
         } else {
-            echo "Error adding item to the cart: " . $stmt->error;
+            // Product is not in the cart, insert a new entry
+            $insert_cart_query = "INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, 1)";
+            $insert_cart_stmt = $conn->prepare($insert_cart_query);
+            $insert_cart_stmt->bind_param("ii", $user_id, $product_id);
+
+            if ($insert_cart_stmt->execute()) {
+                $_SESSION['last_added_time'][$product_id] = time();
+                updateCartTotal($user_id);
+                header("Location: product.php?id=" . $product_id . "&success=added_to_cart");
+                exit;
+            } else {
+                echo "Error adding item to the cart: " . $insert_cart_stmt->error;
+            }
+            $insert_cart_stmt->close();
         }
-        $stmt->close();
+        $check_cart_stmt->close();
     } else {
         echo "Please log in to add items to the cart.";
     }
@@ -56,8 +86,7 @@ function updateCartTotal($user_id) {
             $stmtUpdate = $conn->prepare($updateTotalQuery);
             $stmtUpdate->bind_param("id", $user_id, $totalSum);
 
-            if ($stmtUpdate->execute()) {
-            } else {
+            if (!$stmtUpdate->execute()) {
                 echo "Error updating cart total: " . $stmtUpdate->error;
             }
 
