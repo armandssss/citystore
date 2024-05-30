@@ -202,7 +202,7 @@ label {
 }
 
 .form-group {
-max-width: 30%;
+  max-width: 500px;
   margin: auto;
   margin-bottom: 30px;
   display: flex;
