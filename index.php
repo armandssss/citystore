@@ -81,6 +81,19 @@ function is_loggedin($conn) {
 }
 
 is_loggedin($conn);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['delete_product_id']) && $is_admin) {
+        $delete_product_id = $_POST['delete_product_id'];
+        $delete_sql = "DELETE FROM products WHERE product_id = ?";
+        $delete_stmt = $conn->prepare($delete_sql);
+        $delete_stmt->bind_param("i", $delete_product_id);
+        $delete_stmt->execute();
+        header("Location: /");
+        exit();
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -125,6 +138,15 @@ is_loggedin($conn);
                     if ($result->num_rows > 0) {
                         while ($product = $result->fetch_assoc()) {
                             echo "<div class='product-card'>";
+                            if ($is_admin) {
+                                echo "<div class='admin-buttons'>";
+                                echo "<form method='POST' action='' style='display:inline-block;'>";
+                                echo "<input type='hidden' name='delete_product_id' value='" . $product['product_id'] . "'>";
+                                echo "<a type='submit' class='remove-btn'><i class='fas fa-trash-alt'></i></button>";
+                                echo "</form>";
+                                echo "<a href='/edit_product.php?id=" . $product['product_id'] . "' class='edit-btn'><i class='fas fa-pencil-alt'></i></a>";
+                                echo "</div>";
+                            }
                             echo "<a href='/product.php?id=" . $product['product_id'] . "'>";
                             echo "<div class='product-card-top'>";
                             echo "<img class='product-card-img' src='" . $product['image_url'] . "' alt='" . $product['name'] . "'>";

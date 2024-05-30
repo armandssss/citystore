@@ -71,8 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $image_name = basename($_FILES['image_upload']['name']);
         $image_url = $upload_dir . $image_name;
 
-        if (move_uploaded_file($tmp_name, $image_url)) {
-        } else {
+        if (!move_uploaded_file($tmp_name, $image_url)) {
             echo "Failed to move uploaded file.";
             exit;
         }
@@ -133,6 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border: 2px dashed rgba(255, 255, 255, 0.2);
             text-align: center;
             transition: background 0.3s ease-in-out;
+            position: relative;
         }
 
         .file-area:hover .file-dummy {
@@ -164,7 +164,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .file-area .file-dummy {
-            /* background-color: #f0f0f0; */
             border-color: #ccc;
             width: calc(100% - 18px);
             padding: 30px 0px;
@@ -213,6 +212,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             justify-content: center;
             align-items: center;
         }
+
+        .current-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .file-dummy img {
+            max-width: 100%;
+            max-height: 200px;
+            margin: auto;
+        }
     </style>
 </head>
 <body>
@@ -229,7 +240,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ?>
                 <h1>Edit Product</h1>
                 <div class="form-group">
-                <input type="hidden" name="product_id" value="<?php echo isset($product['product_id']) ? $product['product_id'] : ''; ?>">
+                    <input type="hidden" name="product_id" value="<?php echo isset($product['product_id']) ? $product['product_id'] : ''; ?>">
                     <label for="name">Product Name:</label>
                     <input type="text" id="name" name="name" value="<?php echo isset($product['name']) ? $product['name'] : ''; ?>" class="form-controll">
                 </div>
@@ -242,13 +253,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" id="price" name="price" step="0.01" value="<?php echo isset($product['price']) ? $product['price'] : ''; ?>" class="form-controll">
                 </div>
                 <div class="form-group file-area">
-                    <label for="image_upload">Upload Image:</label>
-                    <input type="file" id="image_upload" name="image_upload" class="form-controll">
+                    <label for="image_upload">Edit Image:</label>
                     <div class="file-dummy">
+                    <input type="file" id="image_upload" name="image_upload" class="form-controll">
                         <div class="success">Great, your file is selected. Proceed.</div>
                         <div class="default">Please select a file</div>
+                        <img id="current-image" src="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" alt="Current Image" class="current-image" style="<?php echo isset($product['image_url']) ? '' : 'display:none;'; ?>">
                     </div>
                     <input type="text" id="image_url" name="image_url" value="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" style="display: none;">
+                </div>
+                <div class="form-group file-area">
+                    <label for="image_upload_2">Edit Additional Image:</label>
+                    <div class="file-dummy">
+                    <input type="file" id="image_upload_2" name="image_upload_2" class="form-controll">
+                        <div class="success">Great, your file is selected. Proceed.</div>
+                        <div class="default">Please select a file</div>
+                        <img id="current-image-2" src="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>" alt="Current Additional Image" class="current-image" style="<?php echo isset($product['image_url_2']) ? '' : 'display:none;'; ?>">
+                    </div>
+                    <input type="text" id="image_url_2" name="image_url_2" value="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>" style="display: none;">
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Update Product" class="form-controll">
@@ -257,5 +279,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <?php include 'footer.php'; ?>
     </div>
+    <script>
+        document.getElementById('image_upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('current-image');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('image_upload_2').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('current-image-2');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
 </html>

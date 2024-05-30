@@ -21,6 +21,7 @@ if (!$is_admin) {
     header("Location: /");
     exit();
 }
+
 $cart_count = 0;
 $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
 $cart_count_result = $conn->query($cart_count_query);
@@ -29,37 +30,43 @@ if ($cart_count_result->num_rows > 0) {
     $row = $cart_count_result->fetch_assoc();
     $cart_count = $row['count'];
 }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $price = $_POST['price'];
-    $image = $_FILES['image']['name'];
+  $name = $_POST['name'];
+  $description = $_POST['description'];
+  $price = $_POST['price'];
+  $company = $_POST['company'];
 
-    $targetDirectory = "uploads/";
-    $targetFilePath = $targetDirectory . basename($image);
+  $image = $_FILES['image']['name'];
+  $image2 = $_FILES['image2']['name'];
 
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
-        $sql = "INSERT INTO products (name, description, price, image_url) VALUES (?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+  $targetDirectory = "uploads/";
+  $targetFilePath = $targetDirectory . basename($image);
+  $targetFilePath2 = $targetDirectory . basename($image2);
 
-        if ($stmt) {
-            $stmt->bind_param("ssds", $name, $description, $price, $targetFilePath);
-            $stmt->execute();
+  if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath) && move_uploaded_file($_FILES['image2']['tmp_name'], $targetFilePath2)) {
+      $sql = "INSERT INTO products (name, description, price, image_url, image_url_2, company) VALUES (?, ?, ?, ?, ?, ?)";
+      $stmt = $conn->prepare($sql);
 
-            if ($stmt->affected_rows > 0) {
-                $successMessage = "Product successfully added.";
-            } else {
-                $errorMessage = "Error adding product: " . $stmt->error;
-            }
+      if ($stmt) {
+          $stmt->bind_param("ssdsss", $name, $description, $price, $targetFilePath, $targetFilePath2, $company);
+          $stmt->execute();
 
-            $stmt->close();
-        } else {
-            $errorMessage = "Error preparing statement: " . $conn->error;
-        }
-    } else {
-        $errorMessage = "Failed to upload the image.";
-    }
+          if ($stmt->affected_rows > 0) {
+              $successMessage = "Product successfully added.";
+          } else {
+              $errorMessage = "Error adding product: " . $stmt->error;
+          }
+
+          $stmt->close();
+      } else {
+          $errorMessage = "Error preparing statement: " . $conn->error;
+      }
+  } else {
+      $errorMessage = "Failed to upload the images.";
+  }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -191,6 +198,7 @@ label {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #000;
   font-weight: 200;
+  border-color: #ccc;
 }
 
 .form-group {
@@ -235,27 +243,49 @@ max-width: 30%;
   
   <div class="form-group">
     <label for="name">Name <span>Enter product name</span></label>
-    <input type="text" name="name" id="name" class="form-controll"/>
+    <input type="text" name="name" id="name" class="form-controll" required/>
   </div>
 
   <div class="form-group">
     <label for="description">Description <span>Enter product description</span></label>
-    <input type="text" name="description" id="description" class="form-controll"/>
+    <input type="text" name="description" id="description" class="form-controll" required/>
   </div>
 
   <div class="form-group">
     <label for="price">Price <span>Enter product price</span></label>
-    <input type="text" name="price" id="price" class="form-controll"/>
+    <input type="number" name="price" id="price" class="form-controll" step="0.01" required/>
   </div>
   
   <div class="form-group file-area">
-    <label for="image">Image <span>Your image should be at least 400x300 wide</span></label>
-    <input type="file" name="image" id="image" required="required"/>
+    <label for="image">Image 1 <span>Your image should be at least 400x300 wide</span></label>
+    <input type="file" name="image" id="image" onchange="displayImage(this, 'image-preview-1')" required/>
     <div class="file-dummy">
-      <div class="success">Great, your file is selected. Proceed.</div>
-      <div class="default">Please select a file</div>
+        <div class="success">Great, your file is selected. Proceed.</div>
+        <div class="default">Please select a file</div>
+        <img id="image-preview-1" src="" alt="Image Preview" style="max-width: 100%; max-height: 200px; display: none; margin:auto;">
     </div>
   </div>
+    
+  <div class="form-group file-area">
+      <label for="image2">Image 2 <span>Your image should be at least 400x300 wide</span></label>
+      <input type="file" name="image2" id="image2" onchange="displayImage(this, 'image-preview-2')" required/>
+      <div class="file-dummy">
+          <div class="success">Great, your file is selected. Proceed.</div>
+          <div class="default">Please select a file</div>
+          <img id="image-preview-2" src="" alt="Image Preview" style="max-width: 100%; max-height: 200px; display: none; margin:auto;">
+      </div>
+  </div>
+
+  <div class="form-group">
+  <label for="company">Company <span>Select product company</span></label>
+  <select name="company" id="company" class="form-controll" required>
+    <option value="" disabled selected>Select a company</option>
+    <option value="Apple">Apple</option>
+    <option value="Samsung">Samsung</option>
+    <option value="Sony">Sony</option>
+  </select>
+</div>
+
   
   <div class="form-group">
     <input type="submit" value="Add Product">
@@ -265,5 +295,20 @@ max-width: 30%;
 </div>
 <?php include 'footer.php'; ?>
 </div>
+<script>
+function displayImage(input, previewId) {
+    var file = input.files[0];
+    var imgPreview = document.getElementById(previewId);
+
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            imgPreview.src = e.target.result;
+            imgPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 </body>
 </html>
