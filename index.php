@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -117,6 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="wrapper">
         <?php include 'header.php'; ?>
         <div class="container">
+            <?php
+                if (isset($_GET['updateSuccess']) && $_GET['updateSuccess'] == 'true') {
+                    echo "<p class='success-message'>Product successfully updated.</p>";
+                }
+            ?>
             <div class="main-page-wrapper">
                 <div class="search-categories">
                     <div class="category-dropdown">
@@ -175,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         echo "<p>No products found.</p>";
                     }
-                    ?>
+                ?>
                 </div>
             </div>
         </div>

@@ -64,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = $_POST['description'];
     $price = $_POST['price'];
     $image_url = $_POST['image_url'];
+    $image_url_2 = $_POST['image_url_2'];
 
     if ($_FILES['image_upload']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = 'uploads/';
@@ -77,15 +78,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $sql = "UPDATE products SET name = ?, description = ?, price = ?, image_url = ? WHERE product_id = ?";
+    if ($_FILES['image_upload_2']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/';
+        $tmp_name = $_FILES['image_upload_2']['tmp_name'];
+        $image_name_2 = basename($_FILES['image_upload_2']['name']);
+        $image_url_2 = $upload_dir . $image_name_2;
+
+        if (!move_uploaded_file($tmp_name, $image_url_2)) {
+            echo "Failed to move uploaded file.";
+            exit;
+        }
+    }
+
+    $sql = "UPDATE products SET name = ?, description = ?, price = ?, image_url = ?, image_url_2 = ? WHERE product_id = ?";
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
-        $stmt->bind_param("ssdsi", $name, $description, $price, $image_url, $product_id);
+        $stmt->bind_param("ssdssi", $name, $description, $price, $image_url, $image_url_2, $product_id);
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            $updateSuccess = true;
+            header("Location: index.php?updateSuccess=true");
+            exit();
         } else {
             echo "Error updating product: " . $stmt->error;
         }
@@ -110,11 +124,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="wrapper">
-        <header>
-            <?php include 'header.php'; ?> 
-        </header>
+        <?php include 'header.php'; ?>
         <div class="container">
-            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data" style="width: 100%;">
                 <?php
                     if ($updateSuccess) {
                         echo "<p class='success-message'>Product successfully updated.</p>";
@@ -123,36 +135,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h1>Edit Product</h1>
                 <div class="form-group">
                     <input type="hidden" name="product_id" value="<?php echo isset($product['product_id']) ? $product['product_id'] : ''; ?>">
-                    <label for="name">Product Name:</label>
-                    <input type="text" id="name" name="name" value="<?php echo isset($product['name']) ? $product['name'] : ''; ?>" class="form-controll">
+                    <label for="name">Name <span>Enter product name</span></label>
+                    <input type="text" id="name" name="name" value="<?php echo isset($product['name']) ? $product['name'] : ''; ?>" class="form-controll" required>
                 </div>
                 <div class="form-group">
-                    <label for="description">Product Description:</label>
-                    <input type="text" id="description" name="description" value="<?php echo isset($product['description']) ? $product['description'] : ''; ?>" class="form-controll">
+                    <label for="description">Description <span>Enter product description</span></label>
+                    <input type="text" id="description" name="description" value="<?php echo isset($product['description']) ? $product['description'] : ''; ?>" class="form-controll" required>
                 </div>
                 <div class="form-group">
-                    <label for="price">Product Price:</label>
-                    <input type="number" id="price" name="price" step="0.01" value="<?php echo isset($product['price']) ? $product['price'] : ''; ?>" class="form-controll">
+                    <label for="price">Price <span>Enter product price</span></label>
+                    <input type="number" id="price" name="price" step="0.01" value="<?php echo isset($product['price']) ? $product['price'] : ''; ?>" class="form-controll" required>
                 </div>
                 <div class="form-group file-area">
-                    <label for="image_upload">Edit Image:</label>
+                    <label for="image_upload">Image 1 <span>Your image should be at least 400x300 wide</span></label>
+                    <input type="file" id="image_upload" name="image_upload" class="form-controll" onchange="displayImage(this, 'current-image')">
                     <div class="file-dummy <?php echo isset($product['image_url']) ? 'success' : ''; ?>">
-                        <input type="file" id="image_upload" name="image_upload" class="form-controll">
                         <div class="success">Great, your file is selected. Proceed.</div>
                         <div class="default">Please select a file</div>
-                        <img id="current-image" src="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" alt="Current Image" class="current-image" style="<?php echo isset($product['image_url']) ? '' : 'display:none;'; ?>">
+                        <img id="current-image" src="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" alt="Current Image" style="<?php echo isset($product['image_url']) ? 'max-width: 100%; max-height: 200px; display: block; margin:auto;' : 'display:none;'; ?>">
                     </div>
-                    <input type="text" id="image_url" name="image_url" value="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>" style="display: none;">
+                    <input type="hidden" id="image_url" name="image_url" value="<?php echo isset($product['image_url']) ? $product['image_url'] : ''; ?>">
                 </div>
                 <div class="form-group file-area">
-                    <label for="image_upload_2">Edit Additional Image:</label>
-                    <div class="file-dummy <?php echo isset($product['image_url']) ? 'success' : ''; ?>">
-                    <input type="file" id="image_upload_2" name="image_upload_2" class="form-controll">
+                    <label for="image_upload_2">Image 2 <span>Your image should be at least 400x300 wide</span></label>
+                    <input type="file" id="image_upload_2" name="image_upload_2" class="form-controll" onchange="displayImage(this, 'current-image-2')">
+                    <div class="file-dummy <?php echo isset($product['image_url_2']) ? 'success' : ''; ?>">
                         <div class="success">Great, your file is selected. Proceed.</div>
                         <div class="default">Please select a file</div>
-                        <img id="current-image-2" src="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>" alt="Current Additional Image" class="current-image" style="<?php echo isset($product['image_url_2']) ? '' : 'display:none;'; ?>">
+                        <img id="current-image-2" src="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>" alt="Current Additional Image" style="<?php echo isset($product['image_url_2']) ? 'max-width: 100%; max-height: 200px; display: block; margin:auto;' : 'display:none;'; ?>">
                     </div>
-                    <input type="text" id="image_url_2" name="image_url_2" value="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>" style="display: none;">
+                    <input type="hidden" id="image_url_2" name="image_url_2" value="<?php echo isset($product['image_url_2']) ? $product['image_url_2'] : ''; ?>">
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Update Product" class="form-controll">
@@ -162,31 +174,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php include 'footer.php'; ?>
     </div>
     <script>
-        document.getElementById('image_upload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('current-image');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
+        function displayImage(input, previewId) {
+            var file = input.files[0];
+            var imgPreview = document.getElementById(previewId);
 
-        document.getElementById('image_upload_2').addEventListener('change', function(event) {
-            const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('current-image-2');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                }
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                };
                 reader.readAsDataURL(file);
             }
-        });
+        }
     </script>
 </body>
 </html>
