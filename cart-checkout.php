@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include 'db.php';
 require __DIR__ . "/vendor/autoload.php";
-$uploadsFolder = "https://citystore.kvd.lv/uploads/";
+$uploadsFolder = "/uploads";
 
 $stripe_secret_key = "sk_test_51OP1WTFpFWLlek0v0V40c2j9IxfQIzeBgoEGw8iMLlgEuHz8PEwaYzUSay2lPo1GRULhgmpwQRy8dA5QFJVXSap100KtRGOuH8";
 
@@ -56,7 +56,6 @@ foreach ($cartItems as $item) {
             "unit_amount" => $item['price'] * 100,
             "product_data" => [
                 "name" => $item['name'],
-                "images" => [$_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $uploadsFolder . '/' . $item['image_url']],
             ],
         ],
     ];
