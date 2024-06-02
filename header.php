@@ -289,7 +289,7 @@ $totalCartQuantity = getTotalCartQuantity();
     xhr.send();
 }
 
-    function openPasswordResetModal() {
+function openPasswordResetModal() {
         const modal = document.getElementById("loginModal");
         modal.style.display = "block";
 
