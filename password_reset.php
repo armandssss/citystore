@@ -4,10 +4,10 @@ if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQ
     exit(json_encode(array('error' => '404')));
 }
 
-require 'C:\Users\arman\Downloads\PHPMailer-master\PHPMailer-master\src\Exception.php';
-require 'C:\Users\arman\Downloads\PHPMailer-master\PHPMailer-master\src\PHPMailer.php';
-require 'C:\Users\arman\Downloads\PHPMailer-master\PHPMailer-master\src\SMTP.php';
-require 'C:\xampp\htdocs\citystore\db.php';
+require '\PHPMailer-master\PHPMailer-master\src\Exception.php';
+require '\PHPMailer-master\PHPMailer-master\src\PHPMailer.php';
+require '\PHPMailer-master\PHPMailer-master\src\SMTP.php';
+require '\db.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
