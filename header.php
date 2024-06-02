@@ -66,6 +66,7 @@ $totalCartQuantity = getTotalCartQuantity();
                     <?php if (isset($is_admin) && $is_admin): ?>
                         <div class="admin-panel">
                             <a href="dashboard.php" class="btn admin-btn">Admin Panel</a>
+                            <a href="users.php" class="btn admin-btn">Users</a>
                         </div>
                     <?php endif; ?>
                     <a href="/" class="btn">Home</a>
