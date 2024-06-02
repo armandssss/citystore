@@ -4,9 +4,9 @@ if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQ
     exit(json_encode(array('error' => '404')));
 }
 
-require 'PHPMailer-master\PHPMailer-master\src\Exception.php';
-require 'PHPMailer-master\PHPMailer-master\src\PHPMailer.php';
-require 'PHPMailer-master\PHPMailer-master\src\SMTP.php';
+require 'PHPMailer-master/PHPMailer-master/src/Exception.php';
+require 'PHPMailer-master/PHPMailer-master/src/PHPMailer.php';
+require 'PHPMailer-master/PHPMailer-master/src/SMTP.php';
 require 'db.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -14,7 +14,7 @@ use PHPMailer\PHPMailer\Exception;
 
 $error_message = '';
 $success_message = '';
-$output = array(); // Initialize output array
+$output = array();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
@@ -32,9 +32,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($stmt->num_rows > 0) {
                 $new_password = generateRandomPassword();
-                $password_updated = true;
+                $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+                $update_query = "UPDATE users SET password = ? WHERE email = ?";
+                $stmtUpdate = $conn->prepare($update_query);
 
-                if ($password_updated) {
+                if ($stmtUpdate) {
+                    $stmtUpdate->bind_param("ss", $hashed_password, $email);
+                    $stmtUpdate->execute();
+                    $stmtUpdate->close();
+
                     $subject = "Password Reset";
                     $message = "Your new password is: " . $new_password;
 
@@ -51,10 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $mail->SMTPAuth = true;
                         $mail->Username = $smtp_username;
                         $mail->Password = $smtp_password;
-                        $mail->SMTPSecure = 'tls';
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = $smtp_port;
 
-                        $mail->setFrom($smtp_username);
+                        $mail->setFrom($smtp_username, 'City Store');
                         $mail->addAddress($email);
 
                         $mail->isHTML(true);
@@ -62,25 +68,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $mail->Body = $message;
 
                         $mail->send();
-
-                        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                        $update_query = "UPDATE users SET password = ? WHERE email = ?";
-                        $stmtUpdate = $conn->prepare($update_query);
-
-                        if ($stmtUpdate) {
-                            $stmtUpdate->bind_param("ss", $hashed_password, $email);
-                            $stmtUpdate->execute();
-                            $stmtUpdate->close();
-                            $success_message = "Email has been sent. Password updated successfully!";
-                        } else {
-                            $error_message = "Error updating password: " . $conn->error;
-                        }
-
+                        $success_message = "Email has been sent. Password updated successfully!";
                     } catch (Exception $e) {
                         $error_message = "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
                     }
                 } else {
-                    $error_message = "Failed to update the password. Please try again later.";
+                    $error_message = "Error updating password: " . $conn->error;
                 }
             } else {
                 $error_message = "Email isn't registered";
@@ -102,7 +95,6 @@ function generateRandomPassword() {
     return $password;
 }
 
-// Prepare JSON response
 $output = array(
     'error' => $error_message,
     'success_message' => $success_message,
@@ -121,7 +113,6 @@ $output['content'] .= '
     <p>Go back to <a href="#" onclick="openLoginModal()">Sign In page</a></p>
 </form>';
 
-// Output response as JSON
 header('Content-Type: application/json');
 echo json_encode($output);
 ?>
