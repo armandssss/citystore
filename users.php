@@ -1,10 +1,41 @@
 <?php
-session_start();
 include 'db.php';
+session_start();
 
 if (!(isset($_SESSION['user_id']) && $_SESSION['user_id'])) {
     header("Location: /");
     exit();
+}
+$user_id = $_SESSION['user_id'];
+
+$check_admin_query = "SELECT role FROM users WHERE id = ?";
+$check_admin_stmt = $conn->prepare($check_admin_query);
+$check_admin_stmt->bind_param("i", $user_id);
+$check_admin_stmt->execute();
+$check_admin_result = $check_admin_stmt->get_result();
+
+$is_admin = false;
+
+if ($check_admin_result->num_rows > 0) {
+    $row = $check_admin_result->fetch_assoc();
+    $is_admin = ($row['role'] === 'admin');
+}
+
+if (!$is_admin) {
+    header("Location: /");
+    exit();
+}
+
+$cart_count = 0;
+$cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
+$cart_count_stmt = $conn->prepare($cart_count_query);
+$cart_count_stmt->bind_param("i", $user_id);
+$cart_count_stmt->execute();
+$cart_count_result = $cart_count_stmt->get_result();
+
+if ($cart_count_result->num_rows > 0) {
+    $row = $cart_count_result->fetch_assoc();
+    $cart_count = $row['count'];
 }
 
 $user_query = "SELECT id, username, email FROM users";
