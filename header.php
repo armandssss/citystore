@@ -84,8 +84,7 @@ $totalCartQuantity = getTotalCartQuantity();
         <div class="other-nav-items">
             <div class="nav-buttons" id="mySearch">
                 <button id="toggle" class="btn" onclick="toggleMoonOutline()"><i class="fas fa-moon"></i></button>
-                <div class="logout">
-            <?php if (isset($_SESSION["user_id"])): ?>
+                <?php if (isset($_SESSION["user_id"])): ?>
                 <div class="avatar-container">
                     <a href="users_profile.php">
                         <img src="<?php echo $profile_picture; ?>" class="avatar">
@@ -93,6 +92,8 @@ $totalCartQuantity = getTotalCartQuantity();
 
                 </div>
             <?php endif; ?>
+                <div class="logout">
+            
 
             <?php
             if (isset($_SESSION["user_id"])) {
