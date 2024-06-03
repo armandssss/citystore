@@ -397,7 +397,7 @@ body {
   .products {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;;
     max-width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
