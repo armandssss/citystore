@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         if ($stmtDefaultPic->affected_rows > 0) {
                             // Registration successful
-                            $output['success'] = "Registration successful. Sign in to continue shopping.";
+                            $output['success'] = "Account has been registered successfully.";
                         } else {
                             $error_message = "Error setting default profile picture.";
                         }                        

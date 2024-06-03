@@ -208,87 +208,83 @@ $totalCartQuantity = getTotalCartQuantity();
     function openRegisterModal() {
         const modal = document.getElementById("loginModal");
         modal.style.display = "block";
-
         loadRegisterFormContent();
     }
 
     function loadRegisterFormContent() {
-    const registerContent = document.getElementById("loginContent");
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "register.php", true);
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                if (response.error) {
-                    registerContent.innerHTML = response.content;
-                    const existingErrorMessage = registerContent.querySelector('.error');
-                    if (!existingErrorMessage) {
-                        const errorMessage = document.createElement('span');
-                        errorMessage.className = 'error';
-                        errorMessage.textContent = response.error;
-                        registerContent.insertBefore(errorMessage, registerContent.firstChild);
+        const registerContent = document.getElementById("loginContent");
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "register.php", true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        registerContent.innerHTML = response.content;
+                        const existingErrorMessage = registerContent.querySelector('.error');
+                        if (!existingErrorMessage) {
+                            const errorMessage = document.createElement('span');
+                            errorMessage.className = 'error';
+                            errorMessage.textContent = response.error;
+                            registerContent.insertBefore(errorMessage, registerContent.firstChild);
+                        } else {
+                            existingErrorMessage.textContent = response.error;
+                            existingErrorMessage.classList.add('shake');
+                            setTimeout(function() {
+                                existingErrorMessage.classList.remove('shake');
+                            }, 1000);
+                        }
+                    } else if (response.success) {
+                        alert(response.success);
+                        closeLoginModal();
                     } else {
-                        existingErrorMessage.textContent = response.error;
-                        existingErrorMessage.classList.add('shake');
-                        setTimeout(function() {
-                            existingErrorMessage.classList.remove('shake');
-                        }, 1000);
-                    }
-                } else if (response.success) {
-                    alert(response.success);
-                    closeLoginModal();
-                } else {
-                    registerContent.innerHTML = response.content;
-                    registerContent.querySelector('form').addEventListener('submit', function (event) {
-                        event.preventDefault();
-                        const formData = new FormData(this);
-                        const xhr = new XMLHttpRequest();
-                        xhr.open("POST", "register.php", true);
-                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                        xhr.onreadystatechange = function () {
-                            if (xhr.readyState === 4 && xhr.status === 200) {
-                                const response = JSON.parse(xhr.responseText);
-                                if (response.error) {
-                                    const existingErrorMessage = registerContent.querySelector('.error');
-                                    if (!existingErrorMessage) {
-                                        const errorMessage = document.createElement('span');
-                                        errorMessage.className = 'error';
-                                        errorMessage.textContent = response.error;
-                                        registerContent.insertBefore(errorMessage, registerContent.firstChild);
+                        registerContent.innerHTML = response.content;
+                        registerContent.querySelector('form').addEventListener('submit', function (event) {
+                            event.preventDefault();
+                            const formData = new FormData(this);
+                            const xhr = new XMLHttpRequest();
+                            xhr.open("POST", "register.php", true);
+                            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                            xhr.onreadystatechange = function () {
+                                if (xhr.readyState === 4 && xhr.status === 200) {
+                                    const response = JSON.parse(xhr.responseText);
+                                    if (response.error) {
+                                        const existingErrorMessage = registerContent.querySelector('.error');
+                                        if (!existingErrorMessage) {
+                                            const errorMessage = document.createElement('span');
+                                            errorMessage.className = 'error';
+                                            errorMessage.textContent = response.error;
+                                            registerContent.insertBefore(errorMessage, registerContent.firstChild);
+                                        } else {
+                                            existingErrorMessage.textContent = response.error;
+                                            existingErrorMessage.classList.add('shake');
+                                            setTimeout(function() {
+                                                existingErrorMessage.classList.remove('shake');
+                                            }, 1000);
+                                        }
+                                    } else if (response.success) {
+                                        alert(response.success);
+                                        closeLoginModal();
                                     } else {
-                                        existingErrorMessage.textContent = response.error;
-                                        existingErrorMessage.classList.add('shake');
-                                        setTimeout(function() {
-                                            existingErrorMessage.classList.remove('shake');
-                                        }, 1000);
+                                        registerContent.innerHTML = response.content;
                                     }
-                                } else if (response.redirect) {
-                                    window.location.href = response.redirect;
-                                } else {
-                                    registerContent.innerHTML = response.content;
                                 }
-                            }
-                        };
-                        xhr.send(formData);
-                    });
+                            };
+                            xhr.send(formData);
+                        });
+                    }
+                } else if (xhr.status === 403) {
+                    const errorMessage = document.createElement('span');
+                    errorMessage.className = 'error';
+                    errorMessage.textContent = 'Access forbidden. Please try again.';
+                    registerContent.innerHTML = '';
+                    registerContent.appendChild(errorMessage);
                 }
-            } else if (xhr.status === 403) {
-                const errorMessage = document.createElement('span');
-                errorMessage.className = 'error';
-                errorMessage.textContent = 'Access forbidden';
-                registerContent.insertBefore(errorMessage, registerContent.firstChild);
-            } else {
-                const errorMessage = document.createElement('span');
-                errorMessage.className = 'error';
-                errorMessage.textContent = 'An error occurred while processing your request';
-                registerContent.insertBefore(errorMessage, registerContent.firstChild);
             }
-        }
-    };
-    xhr.send();
-}
+        };
+        xhr.send();
+    }
 
 function openPasswordResetModal() {
         const modal = document.getElementById("loginModal");
