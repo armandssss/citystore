@@ -62,6 +62,16 @@ body.dark-theme {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
 }
 
+.dark-theme .user-table th {
+    background-color: #424242;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+}
+
+.dark-theme .user-table tbody{
+    background-color: #424242;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+}
+
 .dark-theme .cart-item{
     background-color: #424242;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
@@ -163,51 +173,77 @@ body {
     color: #dc4c64 !important;
 }
 
-.user-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
-    
+.user-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
-.user-table th, .user-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-.user-table th {
+
+.user-card {
     background-color: #fff;
-}
-
-.user-table tbody{
-    background-color:#fafafa;
-}
-
-.action-btn {
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    text-decoration: none;
-}
-.delete-btn {
-    background-color: #dc4c64;
-}
-.pagination {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: calc(33.333% - 20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
 }
-.pagination a {
+
+.user-card img.profile-pic {
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+    margin-top: 20px;
+}
+
+.user-info {
+    padding: 20px;
+}
+
+.user-info h2 {
+    margin: 0;
+    font-size: 24px;
     color: #333;
-    padding: 8px 16px;
+}
+
+.user-info p {
+    margin: 5px 0;
+    color: #777;
+}
+
+.user-actions {
+    margin-top: auto;
+    padding: 10px 20px;
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.action-btn.delete-btn {
+    color: #e74c3c;
     text-decoration: none;
-    border: 1px solid #ddd;
-    margin: 0 4px;
+    font-size: 18px;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 0 5px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: #fff;
     border-radius: 5px;
 }
+
 .pagination a.active {
-    background-color: var(--accent-color);
-    color: white;
-    border: 1px solid rgba(0, 0, 0, .125);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+    background-color: #0056b3;
 }
 
 .admin-panel{

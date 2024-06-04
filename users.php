@@ -113,7 +113,7 @@ if (isset($_GET['delete'])) {
     }
 }
 
-$limit = 10;
+$limit = 12;
 if (isset($_GET["page"])) { 
     $page  = $_GET["page"]; 
 } else { 
@@ -122,7 +122,7 @@ if (isset($_GET["page"])) {
 
 $start_from = ($page-1) * $limit;  
 
-$user_query = "SELECT id, username, email FROM users LIMIT $start_from, $limit";
+$user_query = "SELECT * FROM users LIMIT $start_from, $limit";
 $user_result = $conn->query($user_query);
 
 $total_query = "SELECT COUNT(*) FROM users";
@@ -530,48 +530,38 @@ toggle.addEventListener("click", () => {
 </script>
 <div class="container">
     <div class="main-page-wrapper">
-            <h1>Users</h1>
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($user_result->num_rows > 0): ?>
-                        <?php while ($user = $user_result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $user['id']; ?></td>
-                                <td><?php echo $user['username']; ?></td>
-                                <td><?php echo $user['email']; ?></td>
-                                <td>
-                                    <a href="users.php?delete=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></a>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="4">No users found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            <div class="pagination">
-                <?php if ($total_pages > 1): ?>
-                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                        <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                    <?php endfor; ?>
-                <?php endif; ?>
-            </div>
+        <h1>Users</h1>
+        <div class="user-cards">
+            <?php if ($user_result->num_rows > 0): ?>
+                <?php while ($user = $user_result->fetch_assoc()): ?>
+                    <div class="user-card">
+                        <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture" class="profile-pic">
+                        <div class="user-info">
+                            <h2><?php echo $user['username']; ?></h2>
+                            <p>Email: <?php echo $user['email']; ?></p>
+                            <p>Role: <?php echo $user['role']; ?></p>
+                        </div>
+                        <div class="user-actions">
+                            <a href="users.php?delete=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No users found.</p>
+            <?php endif; ?>
         </div>
+        <div class="pagination">
+            <?php if ($total_pages > 1): ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                <?php endfor; ?>
+            <?php endif; ?>
         </div>
-        <footer>
-            <?php include 'footer.php'; ?>
-        </footer>
     </div>
+    <footer>
+        <?php include 'footer.php'; ?>
+    </footer>
+</div>
     
 </body>
 </html>
