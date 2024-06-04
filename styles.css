@@ -163,6 +163,53 @@ body {
     color: #dc4c64 !important;
 }
 
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+    
+}
+.user-table th, .user-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.user-table th {
+    background-color: #fff;
+}
+
+.user-table tbody{
+    background-color:#fafafa;
+}
+
+.action-btn {
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.delete-btn {
+    background-color: #dc4c64;
+}
+.pagination {
+    text-align: center;
+}
+.pagination a {
+    color: #333;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+    border-radius: 5px;
+}
+.pagination a.active {
+    background-color: var(--accent-color);
+    color: white;
+    border: 1px solid rgba(0, 0, 0, .125);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+}
+
 .admin-panel{
     display: flex;
     align-items: center;
