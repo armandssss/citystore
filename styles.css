@@ -160,7 +160,7 @@ body {
 }
 
 .admin-btn{
-    color:#DC4C64;
+    color: #dc4c64 !important;
 }
 
 .admin-panel{
@@ -1732,6 +1732,7 @@ input[type="submit"]:focus {
     border-radius: 4px;
     transition: background-color 0.3s ease, transform 0.2s ease;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
 }
 
 .btn:hover {
