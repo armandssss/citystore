@@ -5,24 +5,31 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include 'db.php';
 
+$default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
+
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
-    $user_result = $conn->query($user_query);
+    $user_query = "SELECT username, profile_picture FROM users WHERE id = ?";
+    $stmt = $conn->prepare($user_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $user_result = $stmt->get_result();
 
     if ($user_result && $user_result->num_rows > 0) {
         $user_data = $user_result->fetch_assoc();
         $username = $user_data['username'];
         $profile_picture = $user_data['profile_picture'];
+
         if (empty($profile_picture)) {
-            $default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
             $profile_picture = $default_avatar;
         }
     } else {
-        $default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
         $profile_picture = $default_avatar;
     }
+} else {
+    $profile_picture = $default_avatar;
 }
+
 if (isset($_SESSION['dark_mode'])) {
     $darkMode = $_SESSION['dark_mode'];
 } else {
@@ -89,20 +96,17 @@ $totalCartQuantity = getTotalCartQuantity();
                     <a href="users_profile.php">
                         <img src="<?php echo $profile_picture; ?>" class="avatar">
                     </a>
-
                 </div>
-            <?php endif; ?>
+                <?php endif; ?>
                 <div class="logout">
-            
-
-            <?php
-            if (isset($_SESSION["user_id"])) {
-                echo "<a href='logout.php' class='logout-btn'><i class='fa-solid fa-right-from-bracket'></i> Sign Out</a>";
-            } else {
-                echo "<a href='#' class='logout-btn' onclick='openLoginModal()'><i class='fas fa-sign-in-alt'></i> Sign In</a>";
-            }
-            ?>
-            </div>
+                    <?php
+                    if (isset($_SESSION["user_id"])) {
+                        echo "<a href='logout.php' class='logout-btn'><i class='fa-solid fa-right-from-bracket'></i> Sign Out</a>";
+                    } else {
+                        echo "<a href='#' class='logout-btn' onclick='openLoginModal()'><i class='fas fa-sign-in-alt'></i> Sign In</a>";
+                    }
+                    ?>
+                </div>
             </div>
         </div>
     </div>

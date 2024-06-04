@@ -558,6 +558,7 @@ toggle.addEventListener("click", () => {
             <?php endif; ?>
         </div>
     </div>
+    </div>
     <footer>
         <?php include 'footer.php'; ?>
     </footer>
