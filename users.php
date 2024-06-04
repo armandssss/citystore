@@ -1,7 +1,9 @@
 <?php
+// Include database connection and session start
 include 'db.php';
 session_start();
 
+// Check if the user is logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
@@ -13,13 +15,14 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
+// Redirect to homepage if user is not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: /");
     exit;
 }
 
+// Check if the user is an admin
 $user_id = $_SESSION['user_id'];
-
 $check_admin_query = "SELECT role FROM users WHERE id = $user_id";
 $check_admin_result = $conn->query($check_admin_query);
 
@@ -37,11 +40,13 @@ if ($check_admin_result) {
     echo "Error executing the query: " . $conn->error . "<br>";
 }
 
+// Restrict access to the page if the user is not an admin
 if (!$is_admin) {
     echo "You don't have permission to access this page.";
     exit;
 }
 
+// Get cart count for the user
 $cart_count = 0;
 $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
 $cart_count_stmt = $conn->prepare($cart_count_query);
@@ -54,6 +59,7 @@ if ($cart_count_result->num_rows > 0) {
     $cart_count = $row['count'];
 }
 
+// Fetch user details
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
@@ -72,12 +78,15 @@ if (isset($_SESSION['user_id'])) {
         $profile_picture = $default_avatar;
     }
 }
+
+// Get dark mode preference
 if (isset($_SESSION['dark_mode'])) {
     $darkMode = $_SESSION['dark_mode'];
 } else {
     $darkMode = false;
 }
 
+// Function to get total cart quantity
 function getTotalCartQuantity() {
     global $conn;
 
@@ -99,28 +108,45 @@ function getTotalCartQuantity() {
 
 $totalCartQuantity = getTotalCartQuantity();
 
+// Handle user deletion
 if (isset($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
-    $delete_query = "DELETE FROM users WHERE id = ?";
+    $delete_query = "SELECT role FROM users WHERE id = ?";
     $delete_stmt = $conn->prepare($delete_query);
     $delete_stmt->bind_param("i", $delete_id);
+    $delete_stmt->execute();
+    $delete_result = $delete_stmt->get_result();
 
-    if ($delete_stmt->execute()) {
-        header("Location: users.php");
-        exit;
+    if ($delete_result->num_rows > 0) {
+        $delete_user = $delete_result->fetch_assoc();
+        if ($delete_user['role'] !== 'admin') {
+            $delete_query = "DELETE FROM users WHERE id = ?";
+            $delete_stmt = $conn->prepare($delete_query);
+            $delete_stmt->bind_param("i", $delete_id);
+
+            if ($delete_stmt->execute()) {
+                header("Location: users.php");
+                exit;
+            } else {
+                echo "Error deleting user: " . $conn->error;
+            }
+        } else {
+            echo "Cannot delete an admin user.";
+        }
     } else {
-        echo "Error deleting user: " . $conn->error;
+        echo "User not found.";
     }
 }
 
+// Pagination logic
 $limit = 12;
 if (isset($_GET["page"])) { 
     $page  = $_GET["page"]; 
 } else { 
-    $page=1; 
-};  
+    $page = 1; 
+}
 
-$start_from = ($page-1) * $limit;  
+$start_from = ($page - 1) * $limit;
 
 $user_query = "SELECT * FROM users LIMIT $start_from, $limit";
 $user_result = $conn->query($user_query);
@@ -130,7 +156,6 @@ $total_result = $conn->query($total_query);
 $total_row = $total_result->fetch_row();
 $total_records = $total_row[0];
 $total_pages = ceil($total_records / $limit);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -529,36 +554,38 @@ toggle.addEventListener("click", () => {
     }
 </script>
 <div class="container">
-    <div class="main-page-wrapper">
-        <h1>Users</h1>
-        <div class="user-cards">
-            <?php if ($user_result->num_rows > 0): ?>
-                <?php while ($user = $user_result->fetch_assoc()): ?>
-                    <div class="user-card">
-                        <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture" class="profile-pic">
-                        <div class="user-info">
-                            <h2><?php echo $user['username']; ?></h2>
-                            <p>Email: <?php echo $user['email']; ?></p>
-                            <p>Role: <?php echo $user['role']; ?></p>
-                        </div>
-                        <div class="user-actions">
-                            <a href="users.php?delete=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></a>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p>No users found.</p>
-            <?php endif; ?>
+            <div class="main-page-wrapper">
+                <h1>Users</h1>
+                <div class="user-cards">
+                    <?php if ($user_result->num_rows > 0): ?>
+                        <?php while ($user = $user_result->fetch_assoc()): ?>
+                            <div class="user-card <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>">
+                                <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture" class="profile-pic">
+                                <div class="user-info">
+                                    <h2><?php echo $user['username']; ?></h2>
+                                    <p>Email: <?php echo $user['email']; ?></p>
+                                    <p>Role: <?php echo $user['role']; ?></p>
+                                </div>
+                                <div class="user-actions">
+                                    <?php if ($user['role'] !== 'admin'): ?>
+                                        <a href="users.php?delete=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p>No users found.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="pagination">
+                    <?php if ($total_pages > 1): ?>
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                        <?php endfor; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
-        <div class="pagination">
-            <?php if ($total_pages > 1): ?>
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                <?php endfor; ?>
-            <?php endif; ?>
-        </div>
-    </div>
-    </div>
     <footer>
         <?php include 'footer.php'; ?>
     </footer>
