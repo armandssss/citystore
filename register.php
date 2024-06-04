@@ -1,34 +1,40 @@
 <?php
+// Pārbauda, vai pieprasījums ir AJAX, ja nē, atbild ar 403 kļūdu un iziet
 if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
     http_response_code(403);
     exit(json_encode(array('error' => '404')));
 }
 
+// Sāk sesiju un iznīcina jebkuru esošo sesiju
 session_start();
 session_destroy();
 
-// Start a new session
+// Sāk jaunu sesiju
 session_start();
 
+// Iekļauj datubāzes savienojuma failu
 include "db.php";
 
+// Funkcija paroles hash izveidošanai
 function hashPassword($password) {
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
+// Funkcija e-pasta validācijai
 function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-$error_message = ""; // Initialize error message
-$output = array(); // Initialize output array
+$error_message = ""; // Inicializē kļūdu ziņojumu
+$output = array(); // Inicializē izvada masīvu
 
+// Pārbauda, vai pieprasījuma metode ir POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
 
-    // Validations
+    // Validācijas
     if (strlen($username) < 4 || strlen($username) > 50) {
         $error_message = "Username length must be between 4 and 50 characters.";
     } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
@@ -40,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match('/^[a-zA-Z0-9!@#$%^&*]+$/', $password)) {
         $error_message = "Password can only contain letters, numbers, and the following symbols: !@#$%^&*";
     } else {
+        // Pārbauda, vai lietotājvārds vai e-pasts jau pastāv datubāzē
         $checkExisting = "SELECT username, email FROM users WHERE username = ? OR email = ?";
         $stmtCheck = $conn->prepare($checkExisting);
 
@@ -65,7 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error_message = "Error preparing statement: " . $conn->error;
         }
 
-        if (empty($error_message)) { // If no error, proceed with registration
+        // Ja nav kļūdu, turpina ar reģistrāciju
+        if (empty($error_message)) {
             $hashed_password = hashPassword($password);
 
             $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
@@ -86,11 +94,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmtDefaultPic->execute();
 
                         if ($stmtDefaultPic->affected_rows > 0) {
-                            // Registration successful
+                            // Reģistrācija veiksmīga
                             $output['success'] = "Account has been registered successfully.";
                         } else {
                             $error_message = "Error setting default profile picture.";
-                        }                        
+                        }
 
                         $stmtDefaultPic->close();
                     } else {
@@ -112,26 +120,33 @@ $conn->close();
 
 $output['error'] = $error_message;
 
-// Add content to the output
-$output['content'] = '<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '">
+// Sagatavo HTML formu un izvades saturu
+$output['content'] = '
+<!-- Ievades forma reģistrācijai -->
+<form method="post" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '">
     <h2>Register</h2>';
 if (!empty($output['error'])) {
     $output['content'] .= '<span class="error">' . $output['error'] . '</span>';
 }
 $output['content'] .= '
+    <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu e-pasta adresi. -->
     <label for="email">Email</label>
     <input type="text" name="email">
 
+    <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu lietotājvārdu. -->
     <label for="username">Username</label>
     <input type="text" name="username">
 
-
+    <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu paroli. -->
     <label for="password">Password</label>
     <input type="password" name="password">
 
+<!-- Ievadlauku ievades poga -->    
     <input type="submit" value="Register">
+<!-- Pieslēgšanās poga, kura atver pieslēgšanās logu -->  
     <p>Already registered? <a href="#" onclick="openLoginModal()">Sign In Here</a></p>
 </form>';
 
+// Nosūta JSON izvadi
 echo json_encode($output);
 ?>

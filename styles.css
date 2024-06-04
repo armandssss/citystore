@@ -159,6 +159,17 @@ body {
     align-items: center;
 }
 
+.admin-btn{
+    color:#DC4C64;
+}
+
+.admin-panel{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
 .checkout-container{
     display: flex;
     flex-wrap:wrap;
@@ -219,6 +230,12 @@ body {
     .search-categories {
         justify-content: center;
     }
+    .admin-panel{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    } 
 }
 
 .card {
