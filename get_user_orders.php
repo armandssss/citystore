@@ -43,7 +43,9 @@ if (isset($_GET['user_id'])) {
                             <p><strong>Product:</strong> ' . $item['name'] . '</p>
                             <p><strong>Quantity:</strong> ' . $item['quantity'] . '</p>
                             <p><strong>Price:</strong> ' . $item['price'] . '</p>
-                            <img src="' . $item['image_url'] . '" alt="Product Image" style="max-width: 100px;">
+                            <div class="img-box-order" style="display: flex;">
+                            <img src="' . $item['image_url'] . '" alt="Product Image" style="max-width: 100px; margin:auto;">
+                            </div>
                         </div>';
                 }
 
