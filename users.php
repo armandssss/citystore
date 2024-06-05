@@ -599,7 +599,6 @@ toggle.addEventListener("click", () => {
 </script>
 <div class="container">
             <div class="main-page-wrapper">
-                <h1>Users</h1>
                 <div class="search-categories">
                     <div class="category-dropdown">
                         <select id="role-dropdown" onchange="window.location.href='users.php?role=' + this.value">
@@ -621,7 +620,7 @@ toggle.addEventListener("click", () => {
                 <div class="products">
                     <?php if ($user_result->num_rows > 0): ?>
                         <?php while ($user = $user_result->fetch_assoc()): ?>
-                            <div class='product-card'>
+                            <div class='product-card' data-user-id='<?php echo $user['id']; ?>'>
                                 <div class='admin-buttons'>
                                     <?php if ($user['role'] !== 'admin'): ?>
                                         <form id='delete_form_<?php echo $user['id']; ?>' method='POST' action='' style='display:inline-block;'>
@@ -665,7 +664,7 @@ toggle.addEventListener("click", () => {
     </div>
 <div id="myModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
+  <span class="close" onclick="closeModal()">&times;</span>
     <div id="modal-body"></div>
   </div>
 </div>
@@ -692,9 +691,9 @@ document.querySelectorAll('.product-card').forEach(item => {
   });
 });
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
+
+function closeModal() {
+    document.getElementById('myModal').style.display = 'none';
 }
 
 // When the user clicks anywhere outside of the modal, close it
