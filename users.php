@@ -644,12 +644,12 @@ toggle.addEventListener("click", () => {
         </div>
             <?php include 'footer.php'; ?>
     </div>
-    <div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <div id="modal-body"></div>
-    </div>
-    </div>
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="modal-body"></div>
+  </div>
+</div>
 <script>
     function submitForm(userId) {
         if(confirm('Are you sure you want to delete this user?')) {
