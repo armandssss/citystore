@@ -65,13 +65,11 @@ if ($check_admin_result) {
     echo "Error executing the query: " . $conn->error . "<br>";
 }
 
-// Restrict access to the page if the user is not an admin
 if (!$is_admin) {
     echo "You don't have permission to access this page.";
     exit;
 }
 
-// Get cart count for the user
 $cart_count = 0;
 $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
 $cart_count_stmt = $conn->prepare($cart_count_query);
@@ -84,7 +82,6 @@ if ($cart_count_result->num_rows > 0) {
     $cart_count = $row['count'];
 }
 
-// Fetch user details
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
@@ -104,14 +101,12 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
-// Get dark mode preference
 if (isset($_SESSION['dark_mode'])) {
     $darkMode = $_SESSION['dark_mode'];
 } else {
     $darkMode = false;
 }
 
-// Function to get total cart quantity
 function getTotalCartQuantity() {
     global $conn;
 
@@ -133,7 +128,6 @@ function getTotalCartQuantity() {
 
 $totalCartQuantity = getTotalCartQuantity();
 
-// Handle user deletion
 if (isset($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
     $delete_query = "SELECT role FROM users WHERE id = ?";
@@ -163,20 +157,45 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// Pagination logic
-$limit = 12;
-if (isset($_GET["page"])) { 
-    $page  = $_GET["page"]; 
-} else { 
-    $page = 1; 
+$sql = "SELECT * FROM users WHERE 1=1";
+$params = [];
+$types = '';
+
+if (isset($_GET['search_query'])) {
+    $searchQuery = $_GET['search_query'];
+    $sql .= " AND (username LIKE ? OR email LIKE ?)";
+    $params[] = '%' . $searchQuery . '%';
+    $params[] = '%' . $searchQuery . '%';
+    $types .= 'ss';
 }
 
+if (isset($_GET['role']) && $_GET['role'] !== '') {
+    $roleFilter = $_GET['role'];
+    $sql .= " AND role = ?";
+    $params[] = $roleFilter;
+    $types .= 's';
+}
+
+$sql .= " LIMIT ?, ?";
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 12;
 $start_from = ($page - 1) * $limit;
+$params[] = $start_from;
+$params[] = $limit;
+$types .= 'ii';
 
-$user_query = "SELECT * FROM users LIMIT $start_from, $limit";
-$user_result = $conn->query($user_query);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$user_result = $stmt->get_result();
 
-$total_query = "SELECT COUNT(*) FROM users";
+$total_query = "SELECT COUNT(*) FROM users WHERE 1=1";
+if ($searchQuery) {
+    $total_query .= " AND (username LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%')";
+}
+if ($roleFilter) {
+    $total_query .= " AND role = '$roleFilter'";
+}
 $total_result = $conn->query($total_query);
 $total_row = $total_result->fetch_row();
 $total_records = $total_row[0];
@@ -613,7 +632,7 @@ toggle.addEventListener("click", () => {
                                 </div>
                                 <a href='#'>
                                     <div class='product-card-top'>
-                                        <img class='product-card-img' src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
+                                        <img class='product-card-img' style="border-radius:50%; overflow:hidden;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
                                     </div>
                                     <div class='box-down'>
                                         <div class='card-footer'>
@@ -665,7 +684,7 @@ var modal = document.getElementById("myModal");
 var span = document.getElementsByClassName("close")[0];
 
 // When the user clicks on a user card, open the modal
-document.querySelectorAll('.user-card').forEach(item => {
+document.querySelectorAll('.product-card').forEach(item => {
   item.addEventListener('click', event => {
     var userId = item.dataset.userId;
     fetchUserOrders(userId);
