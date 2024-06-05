@@ -83,12 +83,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="wrapper">
 <?php include 'header.php'; ?> 
 <div class="container">
+<div class="main-page-wrapper">
 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" style="width: 100%;">
 <?php if(isset($successMessage)): ?>
     <p class="success-message"><?php echo $successMessage; ?></p>
 <?php endif; ?>
   <h1>Add Product</h1>
-  
   <div class="form-group">
     <label for="name">Name <span>Enter product name</span></label>
     <input type="text" name="name" id="name" class="form-controll" required/>
@@ -140,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
   
 </form>
+</div>
 </div>
 <?php include 'footer.php'; ?>
 </div>

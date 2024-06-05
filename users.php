@@ -1,24 +1,49 @@
 <?php
-// Include database connection and session start
-include 'db.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Check if the user is logged in
+include 'db.php';
+
+$is_admin = false;
+
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
-    $cart_count_result = $conn->query($cart_count_query);
+    $check_admin_query = "SELECT role FROM users WHERE id = ?";
+    $check_admin_stmt = $conn->prepare($check_admin_query);
+    $check_admin_stmt->bind_param("i", $user_id);
+    $check_admin_stmt->execute();
+    $check_admin_result = $check_admin_stmt->get_result();
 
-    if ($cart_count_result->num_rows > 0) {
-        $row = $cart_count_result->fetch_assoc();
-        $cart_count = $row['count'];
+    if ($check_admin_result->num_rows > 0) {
+        $row = $check_admin_result->fetch_assoc();
+        $is_admin = ($row['role'] === 'admin');
     }
 }
 
-// Redirect to homepage if user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: /");
-    exit;
+$searchQuery = '';
+$roleFilter = '';
+
+if (isset($_GET['search_query']) || isset($_GET['role'])) {
+    $searchQuery = isset($_GET['search_query']) ? $_GET['search_query'] : '';
+    $roleFilter = isset($_GET['role']) ? $_GET['role'] : '';
+
+    $sql = "SELECT * FROM users WHERE (username LIKE ? OR email LIKE ?)";
+    if ($roleFilter) {
+        $sql .= " AND role = ?";
+        $stmt = $conn->prepare($sql);
+        $searchParam = "%" . $searchQuery . "%";
+        $stmt->bind_param("sss", $searchParam, $searchParam, $roleFilter);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $searchParam = "%" . $searchQuery . "%";
+        $stmt->bind_param("ss", $searchParam, $searchParam);
+    }
+    $stmt->execute();
+    $user_result = $stmt->get_result();
+} else {
+    $sql = "SELECT * FROM users";
+    $user_result = $conn->query($sql);
 }
 
 // Check if the user is an admin
@@ -556,21 +581,52 @@ toggle.addEventListener("click", () => {
 <div class="container">
             <div class="main-page-wrapper">
                 <h1>Users</h1>
-                <div class="user-cards">
+                <div class="search-categories">
+                    <div class="category-dropdown">
+                        <select id="role-dropdown" onchange="window.location.href='users.php?role=' + this.value">
+                            <option value="" <?php if (!$roleFilter) echo 'selected'; ?>>All Users</option>
+                            <option value="user" <?php if ($roleFilter == 'user') echo 'selected'; ?>>Users</option>
+                            <option value="admin" <?php if ($roleFilter == 'admin') echo 'selected'; ?>>Admins</option>
+                        </select>
+                        <i class="fa-solid fa-caret-down"></i>
+                    </div>
+                    <div class="search-container">
+                        <form method="GET" action="users.php" class="search-form">
+                            <div class="search-wrapper">
+                                <input name="search_query" placeholder="Search for users..." class="search-input" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                                <button name="search" class="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="products">
                     <?php if ($user_result->num_rows > 0): ?>
                         <?php while ($user = $user_result->fetch_assoc()): ?>
-                            <div class="user-card <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>">
-                                <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture" class="profile-pic">
-                                <div class="user-info">
-                                    <h2><?php echo $user['username']; ?></h2>
-                                    <p>Email: <?php echo $user['email']; ?></p>
-                                    <p>Role: <?php echo $user['role']; ?></p>
-                                </div>
-                                <div class="user-actions">
+                            <div class='product-card'>
+                                <div class='admin-buttons'>
                                     <?php if ($user['role'] !== 'admin'): ?>
-                                        <a href="users.php?delete=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" class="action-btn delete-btn"><i class="fas fa-trash-alt"></i></a>
+                                        <form id='delete_form_<?php echo $user['id']; ?>' method='POST' action='' style='display:inline-block;'>
+                                            <input type='hidden' name='delete_user_id' value='<?php echo $user['id']; ?>'>
+                                            <a href='#' class='remove-btn' onclick='submitForm(<?php echo $user['id']; ?>)'><i class='fas fa-trash-alt'></i></a>
+                                        </form>
                                     <?php endif; ?>
                                 </div>
+                                <a href='#'>
+                                    <div class='product-card-top'>
+                                        <img class='product-card-img' src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
+                                    </div>
+                                    <div class='box-down'>
+                                        <div class='card-footer'>
+                                            <div class='img-info'>
+                                                <span class='p-name'><?php echo $user['username']; ?></span>
+                                                <span class='p-company'><?php echo $user['email']; ?></span>
+                                            </div>
+                                            <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
+                                                <span><?php echo $user['role']; ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -586,10 +642,57 @@ toggle.addEventListener("click", () => {
                 </div>
             </div>
         </div>
-    <footer>
-        <?php include 'footer.php'; ?>
-    </footer>
-</div>
-    
+            <?php include 'footer.php'; ?>
+    </div>
+    <div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modal-body"></div>
+    </div>
+    </div>
+<script>
+    function submitForm(userId) {
+        if(confirm('Are you sure you want to delete this user?')) {
+            document.getElementById('delete_form_' + userId).submit();
+        }
+    }
+</script>
+<script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on a user card, open the modal
+document.querySelectorAll('.user-card').forEach(item => {
+  item.addEventListener('click', event => {
+    var userId = item.dataset.userId;
+    fetchUserOrders(userId);
+    modal.style.display = "block";
+  });
+});
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
+// Fetch user orders and populate the modal body
+function fetchUserOrders(userId) {
+  fetch('get_user_orders.php?user_id=' + userId)
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('modal-body').innerHTML = data;
+    });
+}
+</script>
 </body>
 </html>

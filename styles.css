@@ -204,7 +204,7 @@ body {
 }
 
 .admin-highlight {
-    background-color: #dc4c64;
+    color: #dc4c64!important;
 }
 
 .user-info {

@@ -126,6 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="wrapper">
         <?php include 'header.php'; ?>
         <div class="container">
+        <div class="main-page-wrapper">
             <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data" style="width: 100%;">
                 <?php
                     if ($updateSuccess) {
@@ -170,6 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="submit" value="Update Product" class="form-controll">
                 </div>
             </form>
+            </div>
         </div>
         <?php include 'footer.php'; ?>
     </div>
