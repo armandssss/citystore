@@ -161,7 +161,7 @@ body {
 .main-page-wrapper{
     max-width: 1320px;
     margin-top: 3rem;
-    margin-bottom: 7rem;
+    margin-bottom: 3rem;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -2083,10 +2083,15 @@ label {
     font-weight: bold;
 }
 
+.about-section{
+    margin-bottom: 177px;
+}
+
 .contact-info {
     max-width: 800px;
     margin: 0 auto;
     text-align: left;
+    margin-bottom: 177px;
 }
 
 .contact-info h2 {
@@ -2374,6 +2379,7 @@ label {
     width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
+    margin-bottom: 281px;
 }
 
 .cart-items {
