@@ -126,6 +126,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     font-family: 'Be Vietnam Pro', sans-serif;
+    justify-content: flex-end;
 }
 
 #toggle {
@@ -160,7 +161,7 @@ body {
 .main-page-wrapper{
     max-width: 1320px;
     margin-top: 3rem;
-    margin-bottom: 3rem;
+    margin-bottom: 7rem;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -2147,9 +2148,6 @@ label {
     justify-content: flex-start;
 }
 
-.contact-info, .social-icons, .about-us, .quick-links, .newsletter {
-    margin-bottom: 20px;
-}
 
 .icon-link {
     display: flex;
