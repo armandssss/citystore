@@ -630,8 +630,8 @@ toggle.addEventListener("click", () => {
                                     <?php endif; ?>
                                 </div>
                                 <a href='#'>
-                                    <div class='product-card-top'>
-                                        <img class='product-card-img' style="border-radius:50%; overflow:hidden;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
+                                    <div class='product-card-top' style="width: auto; height: 80%; object-fit: cover; margin: auto; display: flex; width: 80%; height: 80%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                        <img class='product-card-img' style="height: 80%; width: auto; max-width: 100%; margin: auto; width: 80%; height: 70%; object-fit: cover; border-radius: 50%;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
                                     </div>
                                     <div class='box-down'>
                                         <div class='card-footer'>
