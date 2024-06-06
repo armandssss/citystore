@@ -54,7 +54,7 @@ if (isset($_GET['user_id'])) {
 
             echo '</div>';
         } else {
-            echo "No orders found for this user.";
+            echo "No orders found for ' . htmlspecialchars($username) . '.";
         }
     } else {
         echo "Error executing query: " . mysqli_error($conn);
