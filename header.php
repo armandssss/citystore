@@ -72,7 +72,7 @@ $totalCartQuantity = getTotalCartQuantity();
                 <div class="nav-buttons" id="myLinks">
                     <?php if (isset($is_admin) && $is_admin): ?>
                         <div class="admin-panel">
-                            <a href="dashboard.php" class="btn admin-btn">Admin Panel</a>
+                            <a href="dashboard.php" class="btn admin-btn">Add Porduct</a>
                             <a href="users.php" class="btn admin-btn">Users</a>
                         </div>
                     <?php endif; ?>
@@ -92,6 +92,7 @@ $totalCartQuantity = getTotalCartQuantity();
             <div class="nav-buttons" id="mySearch">
                 <button id="toggle" class="btn" onclick="toggleMoonOutline()"><i class="fas fa-moon"></i></button>
                 <?php if (isset($_SESSION["user_id"])): ?>
+            <div class="account-controls">
                 <div class="avatar-container">
                     <a href="users_profile.php">
                         <img src="<?php echo $profile_picture; ?>" class="avatar">
@@ -106,6 +107,7 @@ $totalCartQuantity = getTotalCartQuantity();
                         echo "<a href='#' class='logout-btn' onclick='openLoginModal()'><i class='fas fa-sign-in-alt'></i> Sign In</a>";
                     }
                     ?>
+                </div>
                 </div>
             </div>
         </div>

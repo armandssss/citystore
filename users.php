@@ -230,7 +230,7 @@ $total_pages = ceil($total_records / $limit);
                 <div class="nav-buttons" id="myLinks">
                     <?php if (isset($is_admin) && $is_admin): ?>
                         <div class="admin-panel">
-                            <a href="dashboard.php" class="btn admin-btn">Admin Panel</a>
+                            <a href="dashboard.php" class="btn admin-btn">Add Porduct</a>
                             <a href="users.php" class="btn admin-btn">Users</a>
                         </div>
                     <?php endif; ?>

@@ -1501,6 +1501,15 @@ input:focus {
     align-items: center;
 }
 
+.account-controls{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
 .product-image-small {
     max-width: 15vw;
     height: auto;
@@ -1908,7 +1917,7 @@ input[type="submit"]:focus {
     align-items: center;
     width: 100%;
     background-color: #FFFFFF;
-    height:65vh;
+    height:70vh;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -1941,6 +1950,9 @@ input[type="submit"]:focus {
     .cart-item-details {
         justify-content: center;
         margin-right: 0!important;
+    }
+    .logout {
+        margin-right:0px;
     }
 }
 
@@ -2441,10 +2453,7 @@ label {
 }
 
 @media only screen and (max-width: 768px) {
-    .nav-buttons .btn,
-    .nav-buttons .logout {
-        margin-left: 10px;
-    }
+
     .container {
         padding: 40px;
     }
