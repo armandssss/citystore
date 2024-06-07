@@ -17,7 +17,7 @@ function updateLastSeen($conn, $user_id) {
 }
 
 // Function to check if the user is online based on last activity
-function isUserOnline($last_activity_timestamp, $activity_threshold = 60) {
+function isUserOnline($last_activity_timestamp, $activity_threshold = 300) { // Set activity threshold to 5 minutes (300 seconds)
     $current_timestamp = time();
     $last_activity = strtotime($last_activity_timestamp);
     $time_difference = $current_timestamp - $last_activity;

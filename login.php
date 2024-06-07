@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $last_seen = $row['last_seen'];
 
             // Check if password is correct
-            if (password_verify($password, $hashed_password)) {
+            if (verifyPassword($password, $hashed_password)) {
                 // Update last_seen timestamp to current time in UTC
                 $update_last_seen_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
                 $update_stmt = $conn->prepare($update_last_seen_sql);
@@ -66,13 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $output['redirect'] = "/";
                 }
 
-                // Add status message to output
-                $output['status'] = "Online"; // User is online after sign-in
-
+                // Set status message to "Online"
+                $output['status'] = "Online";
             } else {
                 $output['error'] = "Invalid username/email or password.";
             }
-
         } else {
             $output['error'] = "Invalid username/email or password.";
         }
