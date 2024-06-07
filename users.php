@@ -1,14 +1,78 @@
 <?php
+date_default_timezone_set('UTC'); // Set the default timezone
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 include 'db.php';
 
+// Function to update last seen timestamp
+function updateLastSeen($conn, $user_id) {
+    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $user_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+}
+
+// Function to check if the user is online based on last activity
+function isUserOnline($last_activity_timestamp, $activity_threshold = 60) {
+    $current_timestamp = time();
+    $last_activity = strtotime($last_activity_timestamp);
+    $time_difference = $current_timestamp - $last_activity;
+    return ($time_difference <= $activity_threshold);
+}
+
+// Function to format last seen or online status
+function formatLastSeenOrOnline($last_activity_timestamp) {
+    if (isUserOnline($last_activity_timestamp)) {
+        return "Online";
+    } else {
+        // Format the timestamp as "Last Seen: X ago"
+        return "Last Seen: " . timeElapsedString($last_activity_timestamp);
+    }
+}
+
+// Function to convert timestamp to time ago format
+function timeElapsedString($datetime, $full = false) {
+    $now = new DateTime();
+    $ago = new DateTime($datetime); // Assuming $datetime is in a valid format
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
+
 $is_admin = false;
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
+
+    // Update last seen timestamp
+    updateLastSeen($conn, $user_id);
+
     $check_admin_query = "SELECT role FROM users WHERE id = ?";
     $check_admin_stmt = $conn->prepare($check_admin_query);
     $check_admin_stmt->bind_param("i", $user_id);
@@ -46,7 +110,6 @@ if (isset($_GET['search_query']) || isset($_GET['role'])) {
     $user_result = $conn->query($sql);
 }
 
-// Check if the user is an admin
 $user_id = $_SESSION['user_id'];
 $check_admin_query = "SELECT role FROM users WHERE id = $user_id";
 $check_admin_result = $conn->query($check_admin_query);
@@ -84,20 +147,23 @@ if ($cart_count_result->num_rows > 0) {
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $user_query = "SELECT username, profile_picture FROM users WHERE id = $user_id";
+    $user_query = "SELECT username, profile_picture, last_seen FROM users WHERE id = $user_id";
     $user_result = $conn->query($user_query);
 
     if ($user_result && $user_result->num_rows > 0) {
         $user_data = $user_result->fetch_assoc();
         $username = $user_data['username'];
         $profile_picture = $user_data['profile_picture'];
+        $last_seen = $user_data['last_seen'];
         if (empty($profile_picture)) {
             $default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
             $profile_picture = $default_avatar;
         }
+        $user_status = formatLastSeenOrOnline($last_seen);
     } else {
         $default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
         $profile_picture = $default_avatar;
+        $user_status = "Offline";
     }
 }
 
@@ -597,69 +663,70 @@ toggle.addEventListener("click", () => {
     }
 </script>
 <div class="container">
-            <div class="main-page-wrapper">
-                <div class="search-categories">
-                    <div class="category-dropdown">
-                        <select id="role-dropdown" onchange="window.location.href='users.php?role=' + this.value">
-                            <option value="" <?php if (!$roleFilter) echo 'selected'; ?>>All Users</option>
-                            <option value="user" <?php if ($roleFilter == 'user') echo 'selected'; ?>>Users</option>
-                            <option value="admin" <?php if ($roleFilter == 'admin') echo 'selected'; ?>>Admins</option>
-                        </select>
-                        <i class="fa-solid fa-caret-down"></i>
+    <div class="main-page-wrapper">
+        <div class="search-categories">
+            <div class="category-dropdown">
+                <select id="role-dropdown" onchange="window.location.href='users.php?role=' + this.value">
+                    <option value="" <?php if (!$roleFilter) echo 'selected'; ?>>All Users</option>
+                    <option value="user" <?php if ($roleFilter == 'user') echo 'selected'; ?>>Users</option>
+                    <option value="admin" <?php if ($roleFilter == 'admin') echo 'selected'; ?>>Admins</option>
+                </select>
+                <i class="fa-solid fa-caret-down"></i>
+            </div>
+            <div class="search-container">
+                <form method="GET" action="users.php" class="search-form">
+                    <div class="search-wrapper">
+                        <input name="search_query" placeholder="Search for users..." class="search-input" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                        <button name="search" class="search-btn"><i class="fas fa-search"></i></button>
                     </div>
-                    <div class="search-container">
-                        <form method="GET" action="users.php" class="search-form">
-                            <div class="search-wrapper">
-                                <input name="search_query" placeholder="Search for users..." class="search-input" value="<?php echo htmlspecialchars($searchQuery); ?>">
-                                <button name="search" class="search-btn"><i class="fas fa-search"></i></button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="products">
-                    <?php if ($user_result->num_rows > 0): ?>
-                        <?php while ($user = $user_result->fetch_assoc()): ?>
-                            <div class='product-card' data-user-id='<?php echo $user['id']; ?>'>
-                                <div class='admin-buttons'>
-                                    <?php if ($user['role'] !== 'admin'): ?>
-                                        <form id='delete_form_<?php echo $user['id']; ?>' method='POST' action='' style='display:inline-block;'>
-                                            <input type='hidden' name='delete_user_id' value='<?php echo $user['id']; ?>'>
-                                            <a href='#' class='remove-btn' onclick='submitForm(<?php echo $user['id']; ?>)'><i class='fas fa-trash-alt'></i></a>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                                <a href='#'>
-                                    <div class='product-card-top' style="width: auto; height: 80%; object-fit: cover; margin: auto; display: flex; width: 80%; height: 80%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                                        <img class='product-card-img' style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; height: 80%; width: auto; max-width: 100%; margin: auto; width: 80%; height: 70%; object-fit: cover; border-radius: 50%;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
-                                    </div>
-                                    <div class='box-down'>
-                                        <div class='card-footer'>
-                                            <div class='img-info'>
-                                                <span class='p-name'><?php echo $user['username']; ?></span>
-                                                <span class='p-company'><?php echo $user['email']; ?></span>
-                                            </div>
-                                            <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
-                                                <span><?php echo $user['role']; ?></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <p>No users found.</p>
-                    <?php endif; ?>
-                </div>
-                <div class="pagination">
-                    <?php if ($total_pages > 1): ?>
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                            <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                        <?php endfor; ?>
-                    <?php endif; ?>
-                </div>
+                </form>
             </div>
         </div>
-            <?php include 'footer.php'; ?>
+        <div class="products">
+            <?php if ($user_result->num_rows > 0): ?>
+                <?php while ($user = $user_result->fetch_assoc()): ?>
+                    <div class='product-card' data-user-id='<?php echo $user['id']; ?>'>
+                        <div class='admin-buttons'>
+                            <?php if ($user['role'] !== 'admin'): ?>
+                                <form id='delete_form_<?php echo $user['id']; ?>' method='POST' action='' style='display:inline-block;'>
+                                    <input type='hidden' name='delete_user_id' value='<?php echo $user['id']; ?>'>
+                                    <a href='#' class='remove-btn' onclick='submitForm(<?php echo $user['id']; ?>)'><i class='fas fa-trash-alt'></i></a>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                        <span class='p-last-seen'><?php echo 'Last Seen: ' . timeElapsedString($user['last_seen']); ?></span>
+                        <a href='#'>
+                            <div class='product-card-top' style="width: auto; height: 80%; object-fit: cover; margin: auto; display: flex; width: 80%; height: 80%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <img class='product-card-img' style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; height: 80%; width: auto; max-width: 100%; margin: auto; width: 80%; height: 70%; object-fit: cover; border-radius: 50%;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
+                            </div>
+                            <div class='box-down'>
+                                <div class='card-footer'>
+                                    <div class='img-info'>
+                                        <span class='p-name'><?php echo $user['username']; ?></span>
+                                        <span class='p-company'><?php echo $user['email']; ?></span>
+                                    </div>
+                                    <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
+                                        <span><?php echo $user['role']; ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No users found.</p>
+            <?php endif; ?>
+        </div>
+        <div class="pagination">
+            <?php if ($total_pages > 1): ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="users.php?page=<?php echo $i; ?>" class="<?php echo ($page == $i) ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                <?php endfor; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php include 'footer.php'; ?>
     </div>
 <div id="myModal" class="modal">
   <div class="modal-content">

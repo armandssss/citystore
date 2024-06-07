@@ -571,6 +571,14 @@ body {
     color: #777;
 }
 
+.p-last-seen {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #888;
+    font-size: 12px;
+}
+
 .box-down {
     border-top: 1px solid #ddd;
     background-color: #fafafa;
@@ -2081,10 +2089,6 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-}
-
-.about-section{
-    /* height: 49.1vh; */
 }
 
 .contact-info2 {
