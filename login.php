@@ -44,29 +44,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = $row['username'];
             $hashed_password = $row['password'];
             $role = $row['role'];
+            $last_seen = $row['last_seen'];
 
             // Check if password is correct
-            if (password_verify($password, $hashed_password)) {
-                // Store user ID and username in session
-                $_SESSION["user_id"] = $id;
-                $_SESSION["username"] = $username;
+// Check if password is correct
+if (password_verify($password, $hashed_password)) {
+    // Update last_seen timestamp to current time in UTC
+    $update_last_seen_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+    $update_stmt = $conn->prepare($update_last_seen_sql);
+    $update_stmt->bind_param("i", $id);
+    $update_stmt->execute();
+    $update_stmt->close();
 
-                // Update last seen timestamp
-                $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
-                $update_stmt = $conn->prepare($update_sql);
-                $update_stmt->bind_param("i", $id);
-                $update_stmt->execute();
-                $update_stmt->close();
+    // Retrieve the updated last_seen timestamp
+    $updated_last_seen_sql = "SELECT last_seen FROM users WHERE id = ?";
+    $last_seen_stmt = $conn->prepare($updated_last_seen_sql);
+    $last_seen_stmt->bind_param("i", $id);
+    $last_seen_stmt->execute();
+    $last_seen_result = $last_seen_stmt->get_result();
 
-                // Redirect user based on role
-                if ($role === 'admin') {
-                    $output['redirect'] = "dashboard.php";
-                } else {
-                    $output['redirect'] = "https://citystore.kvd.lv/";
-                }
-            } else {
-                $output['error'] = "Invalid username/email or password.";
-            }
+    // Check if user is currently online
+    $is_online = false;
+    if ($last_seen_result && $last_seen_result->num_rows > 0) {
+        $last_seen_row = $last_seen_result->fetch_assoc();
+        $last_seen = $last_seen_row['last_seen'];
+        $is_online = (strtotime($last_seen) > strtotime('-5 minutes'));
+    }
+
+// Prepare status message
+$status_message = $is_online ? "Online" : "Last Seen: " . ($is_online ? "just now" : timeElapsedString($last_seen));
+
+
+    // Store user ID and username in session
+    $_SESSION["user_id"] = $id;
+    $_SESSION["username"] = $username;
+
+    // Redirect user based on role
+    if ($role === 'admin') {
+        $output['redirect'] = "dashboard.php";
+    } else {
+        $output['redirect'] = "/";
+    }
+
+    // Add status message to output
+    $output['status'] = $status_message;
+} else {
+    $output['error'] = "Invalid username/email or password.";
+}
+
         } else {
             $output['error'] = "Invalid username/email or password.";
         }
