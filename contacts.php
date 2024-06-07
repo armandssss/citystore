@@ -45,7 +45,7 @@ if (isset($_SESSION['user_id'])) {
 </header>
 <div class="container"> 
     <div class="main-page-wrapper">
-                <div class="contact-info">
+                <div class="contact-info2">
                     <h2>Contact Us</h2>
                     <p>If you have any questions or need assistance, please don't hesitate to contact us:</p>
                     <ul>

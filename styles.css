@@ -126,7 +126,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
     font-family: 'Be Vietnam Pro', sans-serif;
-    justify-content: flex-end;
 }
 
 #toggle {
@@ -156,6 +155,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height:60vh;
 }
 
 .main-page-wrapper{
@@ -2084,14 +2084,13 @@ label {
 }
 
 .about-section{
-    margin-bottom: 177px;
+    /* height: 49.1vh; */
 }
 
-.contact-info {
+.contact-info2 {
     max-width: 800px;
     margin: 0 auto;
     text-align: left;
-    margin-bottom: 177px;
 }
 
 .contact-info h2 {

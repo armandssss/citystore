@@ -40,9 +40,7 @@ if (isset($_SESSION['user_id'])) {
 </head>
 <body>
 <div class="wrapper">
-<header>
 <?php include 'header.php'; ?> 
-</header>
 <div class="container">
 <div class="main-page-wrapper">
     <div class="about-section">
