@@ -817,7 +817,7 @@ body {
 }
 .avatar-container {
     display: none;
-    padding: 0px 16px 0px 0px;
+    padding: 0px 5px 0px 5px;
 }
 
 .dark-theme .chat-body{
@@ -2233,6 +2233,12 @@ label {
     display: block;
 }
 
+.avatar-container2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right:16px;
+}
 .avatar-container {
     display: flex;
     justify-content: center;
@@ -2245,6 +2251,11 @@ label {
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     object-fit: cover;
+}
+
+.avatar-container2:hover .avatar {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
 }
 
 .avatar-container:hover .avatar {
