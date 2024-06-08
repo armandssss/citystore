@@ -1,18 +1,25 @@
 <?php
-date_default_timezone_set('UTC');
+date_default_timezone_set('UTC'); // Set the default timezone
 
-// Check if the request is AJAX, if not, respond with a 403 error and exit
-if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
-    http_response_code(403);
-    exit(json_encode(array('error' => '403')));
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Start session
-session_start();
+include 'db.php';
 
-// Include database connection file
-include "db.php";
+// Function to update last seen timestamp
+function updateLastSeen($conn, $user_id) {
+    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $user_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+}
 
+// Update last seen timestamp for the logged-in user
+if (isset($_SESSION['user_id'])) {
+    updateLastSeen($conn, $_SESSION['user_id']);
+}
 // Function to verify password
 function verifyPassword($password, $hashed_password) {
     return password_verify($password, $hashed_password);
@@ -48,16 +55,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Check if password is correct
             if (verifyPassword($password, $hashed_password)) {
-                // Update last_seen timestamp to current time in UTC
+                // Store user ID and username in session
+                $_SESSION["user_id"] = $id;
+                $_SESSION["username"] = $username;
+                $_SESSION["online"] = true; // Set the user as online
+
+                // Update last_seen to current timestamp
                 $update_last_seen_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
                 $update_stmt = $conn->prepare($update_last_seen_sql);
                 $update_stmt->bind_param("i", $id);
                 $update_stmt->execute();
                 $update_stmt->close();
-
-                // Store user ID and username in session
-                $_SESSION["user_id"] = $id;
-                $_SESSION["username"] = $username;
 
                 // Redirect user based on role
                 if ($role === 'admin') {
@@ -114,3 +122,4 @@ $output['content'] .= '
 // Send JSON output
 echo json_encode($output);
 ?>
+

@@ -579,6 +579,20 @@ body {
     font-size: 12px;
 }
 
+.img-role.admin-highlight {
+    color: #dc4c64!important;
+}
+
+.role-dropdown {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .box-down {
     border-top: 1px solid #ddd;
     background-color: #fafafa;

@@ -9,7 +9,16 @@ $default_avatar = 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_p
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $user_query = "SELECT username, profile_picture FROM users WHERE id = ?";
+
+    // Update last_seen to current timestamp
+    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $user_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+
+    // Fetch user data
+    $user_query = "SELECT username, profile_picture, last_seen FROM users WHERE id = ?";
     $stmt = $conn->prepare($user_query);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -19,6 +28,7 @@ if (isset($_SESSION['user_id'])) {
         $user_data = $user_result->fetch_assoc();
         $username = $user_data['username'];
         $profile_picture = $user_data['profile_picture'];
+        $last_seen = $user_data['last_seen'];
 
         if (empty($profile_picture)) {
             $profile_picture = $default_avatar;
@@ -28,6 +38,7 @@ if (isset($_SESSION['user_id'])) {
     }
 } else {
     $profile_picture = $default_avatar;
+    $last_seen = null;
 }
 
 if (isset($_SESSION['dark_mode'])) {

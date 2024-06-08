@@ -1,63 +1,76 @@
 <?php
-// Sāk sesiju, ja tā vēl nav sākta
+// Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Iekļauj datubāzes savienojuma failu
+// Include the database connection file
 include 'db.php';
 
-$is_admin = false; // Inicializē mainīgo, kas norāda, vai lietotājs ir administrators
+// Function to update last seen to 'Online'
+function updateLastSeenToOnline($conn, $user_id) {
+    $update_sql = "UPDATE users SET last_seen = 'Online' WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $user_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+}
 
-// Pārbauda, vai sesijā ir lietotāja ID
+$is_admin = false; // Initialize variable to check if the user is an admin
+
+// Check if the user ID is set in the session
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    // Vaicājums, lai pārbaudītu, vai lietotājs ir administrators
+
+    // Update last seen to 'Online'
+    updateLastSeenToOnline($conn, $user_id);
+
+    // Query to check if the user is an admin
     $check_admin_query = "SELECT role FROM users WHERE id = ?";
     $check_admin_stmt = $conn->prepare($check_admin_query);
     $check_admin_stmt->bind_param("i", $user_id);
     $check_admin_stmt->execute();
     $check_admin_result = $check_admin_stmt->get_result();
 
-    // Pārbauda, vai rezultāts satur rindas
+    // Check if the result contains rows
     if ($check_admin_result->num_rows > 0) {
         $row = $check_admin_result->fetch_assoc();
-        $is_admin = ($row['role'] === 'admin'); // Ja lietotājs ir administrators, uzstāda $is_admin uz true
+        $is_admin = ($row['role'] === 'admin'); // Set $is_admin to true if the user is an admin
     }
 
-    // Pārbauda, vai sesijā ir lietotāja ID (atkārtoti)
+    // Check if the user ID is set in the session (redundant check)
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
-        // Vaicājums, lai iegūtu groza preču skaitu
+        // Query to get the cart item count
         $cart_count_query = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
         $cart_count_stmt = $conn->prepare($cart_count_query);
         $cart_count_stmt->bind_param("i", $user_id);
         $cart_count_stmt->execute();
         $cart_count_result = $cart_count_stmt->get_result();
 
-        // Pārbauda, vai rezultāts satur rindas
+        // Check if the result contains rows
         if ($cart_count_result->num_rows > 0) {
             $row = $cart_count_result->fetch_assoc();
-            $cart_count = $row['count']; // Iegūst preču skaitu grozā
+            $cart_count = $row['count']; // Get the number of items in the cart
         }
     }
 }
 
-// Vaicājums, lai iegūtu visas kategorijas
+// Query to get all categories
 $category_query = "SELECT * FROM categories";
 $category_result = $conn->query($category_query);
 
-// Pārbauda, vai kategorijas vaicājums izdevies
+// Check if the category query was successful
 if ($category_result) {
-    $categories = $category_result->fetch_all(MYSQLI_ASSOC); // Iegūst visas kategorijas
+    $categories = $category_result->fetch_all(MYSQLI_ASSOC); // Get all categories
 } else {
-    $categories = array(); // Ja vaicājums neizdevās, inicializē tukšu kategoriju masīvu
+    $categories = array(); // Initialize an empty array if the query failed
 }
 
-// Pārbauda, vai GET pieprasījumā ir meklēšanas vaicājums
+// Check if there is a search query in the GET request
 if (isset($_GET['search'])) {
     $searchQuery = $_GET['search_query'];
-    // Vaicājums, lai meklētu produktus pēc nosaukuma
+    // Query to search for products by name
     $sql = "SELECT product_id, name, description, price, image_url, company FROM products WHERE name LIKE ?";
     $stmt = $conn->prepare($sql);
     $searchParam = "%" . $searchQuery . "%";
@@ -66,7 +79,7 @@ if (isset($_GET['search'])) {
     $result = $stmt->get_result();
 } elseif (isset($_GET['category'])) {
     $category_id = $_GET['category'];
-    // Vaicājums, lai iegūtu produktus pēc kategorijas
+    // Query to get products by category
     $sql = "SELECT p.product_id, p.name, p.description, p.price, p.image_url, p.company
             FROM products p
             INNER JOIN product_categories pc ON p.product_id = pc.product_id
@@ -76,33 +89,17 @@ if (isset($_GET['search'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    // Vaicājums, lai iegūtu visus produktus
+    // Query to get all products
     $sql = "SELECT product_id, name, description, price, image_url, company FROM products";
     $result = $conn->query($sql);
 }
 
-// Funkcija, lai pārbaudītu, vai lietotājs ir pieteicies
-function is_loggedin($conn) {
-    if (isset($_SESSION['user_id'])) {
-        $currentDateTime = date('Y-m-d H:i:s');
-        // Atjaunina lietotāja pēdējā pieteikšanās laiku
-        $stmt = $conn->prepare('UPDATE users SET last_seen = ? WHERE id = ?');
-        $stmt->bind_param('si', $currentDateTime, $_SESSION['user_id']);
-        $stmt->execute();
-        return true; // Lietotājs ir pieteicies
-    }
-
-    return false; // Lietotājs nav pieteicies
-}
-
-is_loggedin($conn); // Pārbauda, vai lietotājs ir pieteicies
-
-// Pārbauda, vai pieprasījuma metode ir POST
+// Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Pārbauda, vai tiek mēģināts dzēst produktu un vai lietotājs ir administrators
+    // Check if a product is being deleted and if the user is an admin
     if (isset($_POST['delete_product_id']) && $is_admin) {
         $delete_product_id = $_POST['delete_product_id'];
-        // Vaicājums, lai dzēstu produktu
+        // Query to delete the product
         $delete_sql = "DELETE FROM products WHERE product_id = ?";
         $delete_stmt = $conn->prepare($delete_sql);
         $delete_stmt->bind_param("i", $delete_product_id);

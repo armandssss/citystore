@@ -9,27 +9,20 @@ include 'db.php';
 
 // Function to update last seen timestamp
 function updateLastSeen($conn, $user_id) {
-    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("i", $user_id);
-    $update_stmt->execute();
-    $update_stmt->close();
-}
-
-// Function to check if the user is online based on last activity
-function isUserOnline($last_activity_timestamp, $activity_threshold = 300) { // Set activity threshold to 5 minutes (300 seconds)
-    $current_timestamp = time();
-    $last_activity = strtotime($last_activity_timestamp);
-    $time_difference = $current_timestamp - $last_activity;
-    return ($time_difference <= $activity_threshold);
+    if (!isset($_SESSION['online']) || !$_SESSION['online']) {
+        $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("i", $user_id);
+        $update_stmt->execute();
+        $update_stmt->close();
+    }
 }
 
 // Function to format last seen or online status
 function formatLastSeenOrOnline($last_activity_timestamp) {
-    if (isUserOnline($last_activity_timestamp)) {
+    if (isset($_SESSION['online']) && $_SESSION['online']) {
         return "Online";
     } else {
-        // Format the timestamp as "Last Seen: X ago"
         return "Last Seen: " . timeElapsedString($last_activity_timestamp);
     }
 }
@@ -70,8 +63,8 @@ $is_admin = false;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
-    // Update last seen timestamp
-    updateLastSeen($conn, $user_id);
+    // Set the user as online
+    $_SESSION['online'] = true;
 
     $check_admin_query = "SELECT role FROM users WHERE id = ?";
     $check_admin_stmt = $conn->prepare($check_admin_query);
@@ -705,8 +698,15 @@ toggle.addEventListener("click", () => {
                                         <span class='p-name'><?php echo $user['username']; ?></span>
                                         <span class='p-company'><?php echo $user['email']; ?></span>
                                     </div>
-                                    <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
-                                        <span><?php echo $user['role']; ?></span>
+                                        <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
+                                        <?php if ($is_admin): ?>
+                                            <select class="role-dropdown" data-user-id="<?php echo $user['id']; ?>" onclick="event.stopPropagation();">
+                                                <option value="user" <?php if ($user['role'] == 'user') echo 'selected'; ?>>User</option>
+                                                <option value="admin" <?php if ($user['role'] == 'admin') echo 'selected'; ?>>Admin</option>
+                                            </select>
+                                        <?php else: ?>
+                                            <span><?php echo $user['role']; ?></span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -735,48 +735,99 @@ toggle.addEventListener("click", () => {
   </div>
 </div>
 <script>
-    function submitForm(userId) {
-        if(confirm('Are you sure you want to delete this user?')) {
-            document.getElementById('delete_form_' + userId).submit();
+document.addEventListener('DOMContentLoaded', function() {
+    const roleDropdowns = document.querySelectorAll('.role-dropdown');
+    
+    roleDropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', function(event) {
+            event.stopPropagation(); // Stop the click event from propagating
+            event.preventDefault(); // Prevent the default behavior
+        });
+        
+        dropdown.addEventListener('change', function(event) {
+            event.stopPropagation(); // Stop the click event from propagating
+            const userId = this.getAttribute('data-user-id');
+            const newRole = this.value;
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'update_role.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert('User role updated successfully');
+                    } else {
+                        alert('Error updating role: ' + response.error);
+                    }
+                } else {
+                    alert('An error occurred while processing the request');
+                }
+            };
+            xhr.send('user_id=' + userId + '&role=' + newRole);
+        });
+    });
+
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on a user card, open the modal
+    document.querySelectorAll('.product-card').forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.stopPropagation(); // Stop the click event from propagating
+            var userId = item.dataset.userId;
+            fetchUserOrders(userId);
+            modal.style.display = "block";
+        });
+    });
+
+    // When the user clicks on the delete button, prevent the modal from opening
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', function(event) {
+            event.stopPropagation(); // Stop the click event from propagating
+            event.preventDefault(); // Prevent the default behavior (scrolling to the top)
+            
+            const userId = btn.parentNode.querySelector('[name="delete_user_id"]').value;
+            const confirmDelete = confirm('Are you sure you want to delete this user?');
+            if (confirmDelete) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'users.php?delete=' + userId, true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        window.location.reload(); // Reload the page after successful deletion
+                    } else {
+                        alert('Error deleting user: ' + xhr.statusText);
+                    }
+                };
+                xhr.send();
+            }
+        });
+    });
+
+    function closeModal() {
+        document.getElementById('myModal').style.display = 'none';
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
         }
     }
-</script>
-<script>
-// Get the modal
-var modal = document.getElementById("myModal");
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks on a user card, open the modal
-document.querySelectorAll('.product-card').forEach(item => {
-  item.addEventListener('click', event => {
-    var userId = item.dataset.userId;
-    fetchUserOrders(userId);
-    modal.style.display = "block";
-  });
+    // Fetch user orders and populate the modal body
+    function fetchUserOrders(userId) {
+        fetch('get_user_orders.php?user_id=' + userId)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('modal-body').innerHTML = data;
+            });
+    }
 });
-
-
-function closeModal() {
-    document.getElementById('myModal').style.display = 'none';
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-
-// Fetch user orders and populate the modal body
-function fetchUserOrders(userId) {
-  fetch('get_user_orders.php?user_id=' + userId)
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('modal-body').innerHTML = data;
-    });
-}
 </script>
 </body>
 </html>
