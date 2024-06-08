@@ -1,4 +1,5 @@
 <?php
+include "update_last_seen.php";
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
