@@ -579,6 +579,10 @@ body {
     font-size: 12px;
 }
 
+.online-user{
+    color: #14a44d!important;
+}
+
 .img-role.admin-highlight {
     color: #dc4c64!important;
 }
