@@ -9,28 +9,40 @@ include 'db.php';
 
 // Function to update last seen timestamp
 function updateLastSeen($conn, $user_id) {
-    if (!isset($_SESSION['online']) || !$_SESSION['online']) {
-        $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
-        $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("i", $user_id);
-        $update_stmt->execute();
-        $update_stmt->close();
-    }
+    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("i", $user_id);
+    $update_stmt->execute();
+    $update_stmt->close();
+}
+
+// Update the last seen timestamp for the logged-in user
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    updateLastSeen($conn, $user_id);
+}
+
+// Function to check if a user is online
+function isUserOnline($last_seen) {
+    $now = new DateTime();
+    $last_seen_time = new DateTime($last_seen);
+    $interval = $now->diff($last_seen_time);
+    return ($interval->i < 5 && $interval->h == 0 && $interval->d == 0); // Consider online if last seen within 5 minutes
 }
 
 // Function to format last seen or online status
-function formatLastSeenOrOnline($last_activity_timestamp) {
-    if (isset($_SESSION['online']) && $_SESSION['online']) {
+function formatLastSeenOrOnline($last_seen) {
+    if (isUserOnline($last_seen)) {
         return "Online";
     } else {
-        return "Last Seen: " . timeElapsedString($last_activity_timestamp);
+        return "Last Seen: " . timeElapsedString($last_seen);
     }
 }
 
 // Function to convert timestamp to time ago format
 function timeElapsedString($datetime, $full = false) {
     $now = new DateTime();
-    $ago = new DateTime($datetime); // Assuming $datetime is in a valid format
+    $ago = new DateTime($datetime);
     $diff = $now->diff($ago);
 
     $diff->w = floor($diff->d / 7);
@@ -687,7 +699,7 @@ toggle.addEventListener("click", () => {
                                 </form>
                             <?php endif; ?>
                         </div>
-                        <span class='p-last-seen'><?php echo "Last Seen: " . timeElapsedString($user['last_seen']); ?></span>
+                        <span class='p-last-seen'><?php echo formatLastSeenOrOnline($user['last_seen']); ?></span>
                         <a href='#'>
                             <div class='product-card-top' style="width: auto; height: 80%; object-fit: cover; margin: auto; display: flex; width: 80%; height: 80%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                                 <img class='product-card-img' style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; height: 80%; width: auto; max-width: 100%; margin: auto; width: 80%; height: 70%; object-fit: cover; border-radius: 50%;" src='<?php echo $user['profile_picture']; ?>' alt='Profile Picture'>
@@ -698,7 +710,7 @@ toggle.addEventListener("click", () => {
                                         <span class='p-name'><?php echo $user['username']; ?></span>
                                         <span class='p-company'><?php echo $user['email']; ?></span>
                                     </div>
-                                        <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
+                                    <div class='img-role <?php echo ($user['role'] === 'admin') ? 'admin-highlight' : ''; ?>'>
                                         <?php if ($is_admin): ?>
                                             <select class="role-dropdown" data-user-id="<?php echo $user['id']; ?>" onclick="event.stopPropagation();">
                                                 <option value="user" <?php if ($user['role'] == 'user') echo 'selected'; ?>>User</option>
