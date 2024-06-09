@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Redirect user based on role
                 if ($role === 'admin') {
-                    $output['redirect'] = "dashboard.php";
+                    $output['redirect'] = "/";
                 } else {
                     $output['redirect'] = "/";
                 }

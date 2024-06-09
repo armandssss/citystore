@@ -1,4 +1,5 @@
 <?php
+include "update_last_seen.php";
 date_default_timezone_set('UTC'); // Set the default timezone
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -7,19 +8,13 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include 'db.php';
 
-// Function to update last seen timestamp
-function updateLastSeen($conn, $user_id) {
-    $update_sql = "UPDATE users SET last_seen = UTC_TIMESTAMP() WHERE id = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("i", $user_id);
-    $update_stmt->execute();
-    $update_stmt->close();
-}
-
-// Update the last seen timestamp for the logged-in user
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    updateLastSeen($conn, $user_id);
+} else {
+    session_unset();
+    session_destroy();
+    header("Location: /");
+    exit;
 }
 
 // Function to check if a user is online
@@ -789,7 +784,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // When the user clicks on a user card, open the modal
     document.querySelectorAll('.product-card').forEach(item => {
         item.addEventListener('click', function(event) {
-            event.stopPropagation(); // Stop the click event from propagating
             var userId = item.dataset.userId;
             fetchUserOrders(userId);
             modal.style.display = "block";
@@ -821,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function closeModal() {
-        document.getElementById('myModal').style.display = 'none';
+        document.getElementById('myModal').modal.style.display = "none";
     }
 
     // When the user clicks anywhere outside of the modal, close it

@@ -1,5 +1,5 @@
 <?php
-session_start();
+include "update_last_seen.php";
 include "db.php";
 
 if (!isset($_SESSION['user_id'])) {
