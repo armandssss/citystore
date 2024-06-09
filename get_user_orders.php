@@ -35,7 +35,7 @@ if (isset($_GET['user_id'])) {
                 $orders[$row['order_id']]['items'][] = $row;
             }
 
-            echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 10px;">
                     <h2>Orders for ' . $username . '</h2>';
             
             foreach ($orders as $orderId => $order) {
@@ -45,12 +45,12 @@ if (isset($_GET['user_id'])) {
                         <p><strong>Order Date:</strong> ' . $order['created_at'] . '</p>';
 
                 foreach ($order['items'] as $item) {
-                    echo '<div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;">
-                            <p><strong>Product:</strong> ' . htmlspecialchars($item['name']) . '</p>
-                            <p><strong>Quantity:</strong> ' . htmlspecialchars($item['quantity']) . '</p>
-                            <p><strong>Price:</strong> ' . htmlspecialchars($item['price']) . '</p>
-                            <div class="img-box-order" style="display: flex;">
-                            <img src="' . htmlspecialchars($item['image_url']) . '" alt="Product Image" style="max-width: 100px; margin:auto;">
+                    echo '<div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 5px; display: flex; align-items: center;">
+                            <img src="' . htmlspecialchars($item['image_url']) . '" alt="Product Image" style="max-width: 50px; margin-right: 10px;">
+                            <div>
+                                <p style="margin: 0;"><strong>Product:</strong> ' . htmlspecialchars($item['name']) . '</p>
+                                <p style="margin: 0;"><strong>Quantity:</strong> ' . htmlspecialchars($item['quantity']) . '</p>
+                                <p style="margin: 0;"><strong>Price:</strong> ' . htmlspecialchars($item['price']) . '</p>
                             </div>
                         </div>';
                 }
@@ -60,12 +60,12 @@ if (isset($_GET['user_id'])) {
 
             echo '</div>';
         } else {
-            echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 10px;">
                     <h2>No orders found for ' . $username . '</h2>
                   </div>';
         }
     } else {
-        echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+        echo '<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 10px;">
                 <h2>User not found.</h2>
               </div>';
     }
