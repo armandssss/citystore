@@ -158,7 +158,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php echo $category['name']; ?>
                                 </option>
                             <?php endforeach; ?>
+                            <div class="dropdown-icon">
+                            </div>
                         </select>
+
                         <i class="fa-solid fa-caret-down"></i> <!-- Ikona dropdown izvēlnei -->
                     </div>
                     <div class="search-container">
