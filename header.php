@@ -426,26 +426,32 @@ toggle.addEventListener("click", () => {
 </script>
 <script>
     function myFunction() {
-        var x = document.getElementById("myLinks");
-        var y = document.getElementById("mySearch");
-        var z = document.getElementById("myLinks2");
+    var x = document.getElementById("myLinks");
+    var y = document.getElementById("mySearch");
+    var z = document.getElementById("myLinks2");
 
+    if (x) {
         if (x.style.display === "flex") {
             x.style.display = "none";
         } else {
             x.style.display = "flex";
         }
+    }
 
+    if (y) {
         if (y.style.display === "flex") {
             y.style.display = "none";
         } else {
             y.style.display = "flex";
         }
+    }
 
+    if (z) {
         if (z.style.display === "flex") {
             z.style.display = "none";
         } else {
             z.style.display = "flex";
         }
     }
+}
 </script>

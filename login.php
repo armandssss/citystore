@@ -95,11 +95,11 @@ if (!empty($output['error'])) {
 $output['content'] .= '
     <!-- Input field for username or email -->
     <label for="username_or_email">Username or Email</label>
-    <input type="text" id="username_or_email" name="username_or_email">
+    <input type="text" id="username_or_email" name="username_or_email" autocomplete="username">
 
     <!-- Input field for password -->
     <label for="password">Password</label>
-    <input type="password" id="password" name="password">
+    <input type="password" id="password" name="password" autocomplete="current-password">
 
     <!-- Login button -->
     <input type="submit" value="Sign In">

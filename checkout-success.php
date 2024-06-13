@@ -73,10 +73,10 @@ if (isset($_SESSION['user_id'])) {
     <meta http-equiv="Content-Security-Policy">
 </head>
 <body style="background-color:#4286f4;justify-content: center;">
-    <div class="payment-success">
+    <div class="payment-success" style="color:white;">
         <h1>Payment Successful!</h1>
         <p>Your payment has been processed successfully. Thank you for your purchase!</p>
-        <strong><p><a href="/" style="color:white;">Go Back to Shop</a></p></strong>
+        <strong><p><a href="/" >Go Back to Shop</a></p></strong>
     </div>
     <script>
     document.addEventListener("DOMContentLoaded", function () {

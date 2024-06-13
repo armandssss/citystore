@@ -982,12 +982,6 @@ input:focus {
     background-color: #0056b3;
 }
 
-@media only screen and (max-width: 780px) {
-    .category-dropdown i {
-        left: auto!important;
-        right: 20px !important;
-    }
-}
 
 .category-dropdown select {
     padding: 10px;

@@ -131,15 +131,15 @@ if (!empty($output['error'])) {
 $output['content'] .= '
     <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu e-pasta adresi. -->
     <label for="email">Email</label>
-    <input type="text" name="email">
+    <input type="text" name="email" autocomplete="username">
 
     <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu lietotājvārdu. -->
     <label for="username">Username</label>
-    <input type="text" name="username">
+    <input type="text" name="username" autocomplete="username">
 
     <!-- Šis ir ievadlauks, kur lietotājs var ievadīt savu paroli. -->
     <label for="password">Password</label>
-    <input type="password" name="password">
+    <input type="password" name="password" autocomplete="username">
 
 <!-- Ievadlauku ievades poga -->    
     <input type="submit" value="Register">
