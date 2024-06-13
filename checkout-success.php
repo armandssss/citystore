@@ -75,8 +75,8 @@ if (isset($_SESSION['user_id'])) {
 <body style="background-color:#4286f4;justify-content: center;">
     <div class="payment-success" style="color:white;">
         <h1>Payment Successful!</h1>
-        <p>Your payment has been processed successfully. Thank you for your purchase!</p>
-        <strong><p><a href="/" style="color:white;">Go Back to Shop</a></p></strong>
+        <p style="margin-bottom: 30px;">Your payment has been processed successfully. Thank you for your purchase!</p>
+        <strong><p><a href="/" style="color:white;" class="logout-btn">Go Back to Shop</a></p></strong>
     </div>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
