@@ -227,7 +227,7 @@ if ($result->num_rows > 0):
                         endif;
                     else: ?>
                         <p style="text-transform: uppercase; color:red; font-weight:bold; letter-spacing: 0.8px;">Please log in to view the cart.</p>
-                        <a href="#" onclick="openLoginModal()" style="color:var(--accent-color); font-weight:bold; text-decoration:underline;">SIGN IN</a>
+                        <a href="#" onclick="openLoginModal()" style="color:var(--text-color); font-weight:bold; text-decoration:underline;">SIGN IN</a>
                     <?php endif; ?>
                 </div>
                 <?php if (isset($_SESSION['user_id']) && $cart_count > 0 && $totalSum >= 0): ?>
