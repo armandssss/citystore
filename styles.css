@@ -67,6 +67,20 @@ body.dark-theme {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
 }
 
+.dark-theme input::placeholder {
+    color: #cfcfcf;
+}
+
+.dark-theme .role-dropdown{
+    background-color: #424242;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
+    color:white;
+}
+
+.dark-theme .p-last-seen{
+    color: #9e9e9e;
+}
+
 .dark-theme .box-down{
     background-color: #424242;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .07), 0 4px 6px -2px rgba(0, 0, 0, .05);
