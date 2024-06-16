@@ -2460,6 +2460,33 @@ label {
 ::-webkit-scrollbar-thumb {
     background-color: var(--accent-color);
 }
+@media only screen and (max-width: 1319px) {
+    .header-items {
+        max-width:980px;
+    }
+    .search-categories {
+        max-width:980px;
+    }
+    .user-center {
+        max-width:980px;
+    }
+}
+
+@media only screen and (max-width: 990px) {
+    .header-items {
+        max-width: 640px;
+    }  
+    .user-center {
+        max-width: 640px;
+    }  
+    .cart-details {
+        max-width: 640px;
+    }  
+    .checkout-button {
+        max-width: 640px;
+    }  
+}
+
 @media only screen and (max-width: 1500px) {
     .products {
         flex-wrap: wrap;
