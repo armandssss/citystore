@@ -35,8 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
 
     // Validācijas
-    if (strlen($username) < 4 || strlen($username) > 50) {
-        $error_message = "Username length must be between 4 and 50 characters.";
+    if (strlen($username) < 4 || strlen($username) > 15) {
+        $error_message = "Username length must be between 4 and 15 characters.";
     } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
         $error_message = "Username can only contain letters, numbers, and underscores.";
     } elseif (!isValidEmail($email)) {
